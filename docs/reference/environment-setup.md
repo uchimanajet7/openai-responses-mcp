@@ -124,7 +124,7 @@ YAML は任意。無くても動きます。置く場合の既定パス：
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5-mini
+    model: gpt-5.1
     reasoning_effort: medium
     verbosity: medium
 ```

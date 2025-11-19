@@ -38,15 +38,15 @@ openai:
 # マルチプロファイル設定
 model_profiles:
   answer:                          # 基準ツール（必須）
-    model: string                  # 例: gpt-5-mini
+    model: string                  # 例: gpt-5.1
     reasoning_effort: string       # low|medium|high（推奨）
     verbosity: string              # low|medium|high
   answer_detailed:                 # 詳細分析（オプション）
-    model: string                  # 例: gpt-5
+    model: string                  # 例: gpt-5.1-codex
     reasoning_effort: string
     verbosity: string
   answer_quick:                    # 高速回答（オプション）
-    model: string                  # 例: gpt-5-nano
+    model: string                  # 例: gpt-5.1-chat-latest
     reasoning_effort: string
     verbosity: string
 
@@ -87,7 +87,7 @@ openai:
 
 # マルチプロファイル既定値
 model_profiles:
-  answer: { model: gpt-5-mini, reasoning_effort: medium, verbosity: medium }
+  answer: { model: gpt-5.1, reasoning_effort: medium, verbosity: medium }
 
 request: { timeout_ms: 300000, max_retries: 3 }
 
@@ -110,7 +110,7 @@ server: { transport: stdio, debug: false, debug_file: null, show_config_on_start
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5-mini
+    model: gpt-5.1
     reasoning_effort: medium
     verbosity: medium
 ```
@@ -124,15 +124,15 @@ openai:
 # マルチプロファイル設定（v0.4.0+）
 model_profiles:
   answer_detailed:
-    model: gpt-5
+    model: gpt-5.1-codex
     reasoning_effort: high
     verbosity: high
   answer:
-    model: gpt-5-mini
+    model: gpt-5.1
     reasoning_effort: medium
     verbosity: medium
   answer_quick:
-    model: gpt-5-mini
+    model: gpt-5.1-chat-latest
     reasoning_effort: low
     verbosity: low
 
@@ -213,7 +213,7 @@ node build/index.js --show-config 2> effective-config.json
   },
   "effective": {
     "openai": { "api_key_env": "OPENAI_API_KEY", "base_url": "https://api.openai.com/v1" },
-    "model_profiles": { "answer": { "model": "gpt-5", "reasoning_effort": "medium", "verbosity": "medium" } },
+    "model_profiles": { "answer": { "model": "gpt-5.1", "reasoning_effort": "medium", "verbosity": "medium" } },
     "request": { "timeout_ms": 300000, "max_retries": 3 },
     
     "policy": { "prefer_search_when_unsure": true, "max_citations": 3, "require_dates_iso": true },

@@ -40,15 +40,15 @@ Claude 系クライアント（Claude Code / Claude Desktop）は、共通して
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5
+    model: gpt-5.1
     reasoning_effort: medium
     verbosity: medium
   answer_detailed:
-    model: gpt-5
+    model: gpt-5.1-codex
     reasoning_effort: high
     verbosity: high
   answer_quick:
-    model: gpt-5-mini
+    model: gpt-5.1-chat-latest
     reasoning_effort: low
     verbosity: low
 ```

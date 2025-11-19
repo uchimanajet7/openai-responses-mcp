@@ -60,7 +60,7 @@ Content-Length: 156
 ```http
 Content-Length: 204
 
-{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"answer\":\"...\",\"used_search\":false,\"citations\":[],\"model\":\"gpt-5\"}"}]}}
+{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"answer\":\"...\",\"used_search\":false,\"citations\":[],\"model\":\"gpt-5.1\"}"}]}}
 ```
 
 **送信（例・エラー）**

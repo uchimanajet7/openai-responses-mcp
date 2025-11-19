@@ -123,7 +123,7 @@ npx openai-responses-mcp@latest --stdio --debug ./_debug.log --config ~/.config/
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5
+    model: gpt-5.1
     reasoning_effort: medium
     verbosity: medium
 

@@ -18,4 +18,5 @@ setTimeout(() => {
 setTimeout(() => {
   child.stdin.write(encode({ jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "answer", arguments: { query: "hello" } } }));
 }, 160);
-setTimeout(() => child.kill(), 600);
+// answer の検索完了を待つため 4s 以上確保（docs/spec.md §10）
+setTimeout(() => child.kill(), 4000);

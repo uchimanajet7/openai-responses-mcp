@@ -87,7 +87,7 @@ Content-Length: 156
 ```http
 Content-Length: 204
 
-{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"answer\":\"...\",\"used_search\":false,\"citations\":[],\"model\":\"gpt-5\"}"}]}}
+{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"answer\":\"...\",\"used_search\":false,\"citations\":[],\"model\":\"gpt-5.1\"}"}]}}
 ```
 
 ### 2.6 ping（任意）
@@ -130,11 +130,11 @@ Claude Code等のMCPクライアントは、ユーザーの指示内容に基づ
 ```yaml
 model_profiles:
   answer:           # 必須プロファイル
-    model: gpt-5-mini
+    model: gpt-5.1
     reasoning_effort: medium
     verbosity: medium
   answer_detailed:  # オプション（省略時はanswerで代替）
-    model: gpt-5
+    model: gpt-5.1-codex
     reasoning_effort: high
     verbosity: high
   # answer_quick は省略 → answer の設定で動作
@@ -144,7 +144,7 @@ model_profiles:
 ```yaml
 model_profiles:
   answer:  # 必須のみ設定
-    model: gpt-5-mini
+    model: gpt-5.1
     reasoning_effort: medium
     verbosity: medium
 # 全ツールがこの設定で動作
@@ -223,7 +223,7 @@ model_profiles:
       "published_at": "YYYY-MM-DD (optional)"
     }
   ],
-  "model": "used model id (e.g., gpt-5)"
+  "model": "used model id (e.g., gpt-5.1)"
 }
 ```
 - **順序規約（回答本文側）**：本文 →（必要に応じて）箇条書き →（web_search 使用時のみ）`Sources:` で URL + ISO 日付を併記。
@@ -266,17 +266,17 @@ responses: { stream: false, json_mode: false }
 
 model_profiles:
   answer:           # 必須・基準プロファイル
-    model: gpt-5-mini
+    model: gpt-5.1
     reasoning_effort: medium
     verbosity: medium
     
   answer_detailed:  # オプション・詳細分析用
-    model: gpt-5
+    model: gpt-5.1-codex
     reasoning_effort: high
     verbosity: high
     
   answer_quick:     # オプション・高速回答用
-    model: gpt-5-nano
+    model: gpt-5.1-chat-latest
     reasoning_effort: minimal
     verbosity: low
 
@@ -423,6 +423,7 @@ server: { transport: stdio, debug: false, debug_file: null, show_config_on_start
 - 「HTTP 404 の意味」は `used_search=false`、`citations=[]` で返る。
 - 「本日 YYYY-MM-DD の東京の天気」は `used_search=true`、`citations.length>=1`、本文に URL + ISO 日付併記。
 - `npm run mcp:smoke` が `initialize → tools/list → tools/call(answer)` の 3 応答を返す。
+- `scripts/mcp-smoke*.js` を含む社内スモークスクリプトは、`tools/call` の検索完了を待てるよう `child.kill()` まで **4000ms 以上**待機し、`answer`/`answer_quick` のレスポンス本文を実際に観測できること（強制終了で応答を潰さない）。
 
 ---
 
@@ -527,7 +528,7 @@ server: { transport: stdio, debug: false, debug_file: null, show_config_on_start
   "answer": "2025-08-09（JST）の東京都の天気は……（略）。\n\nSources:\n- https://www.jma.go.jp/... (2025-08-09)",
   "used_search": true,
   "citations": [{"url":"https://www.jma.go.jp/...","title":"気象庁｜天気予報","published_at":"2025-08-09"}],
-  "model": "gpt-5"
+  "model": "gpt-5.1"
 }
 ```
 

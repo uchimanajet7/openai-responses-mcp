@@ -91,7 +91,7 @@ YAML は**任意**です。無くても動作します（TS 既定 + ENV/CLI）�
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5-mini
+    model: gpt-5.1
     reasoning_effort: medium
     verbosity: medium
 
@@ -113,7 +113,7 @@ node build/index.js --help
 # 実効設定の確認（sources に反映元が出る）
 npx openai-responses-mcp --show-config 2> effective.json
 npx openai-responses-mcp --show-config --config ./config/config.yaml 2> effective.json
-MODEL_ANSWER=gpt-5 npx openai-responses-mcp --show-config 2> effective.json
+MODEL_ANSWER=gpt-5.1 npx openai-responses-mcp --show-config 2> effective.json
 ```
 
 期待例（抜粋）:
@@ -121,7 +121,7 @@ MODEL_ANSWER=gpt-5 npx openai-responses-mcp --show-config 2> effective.json
 {
   "version": "0.4.0",
   "sources": { "ts_defaults": true, "yaml": "./config/config.yaml", "env": ["MODEL_ANSWER"], "cli": [] },
-  "effective": { "model_profiles": { "answer": { "model": "gpt-5.2", "reasoning_effort": "medium", "verbosity": "medium" } } }
+  "effective": { "model_profiles": { "answer": { "model": "gpt-5.1", "reasoning_effort": "medium", "verbosity": "medium" } } }
 }
 ```
 

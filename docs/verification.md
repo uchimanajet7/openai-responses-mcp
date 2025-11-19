@@ -29,7 +29,7 @@ node build/index.js --help
 # 素の状態
 node build/index.js --show-config 2> effective.json; cat effective.json | jq '.version, .sources, .effective.model_profiles.answer.model'
 ```
-**期待**: `sources.ts_defaults=true` が含まれ、`effective.model_profiles.answer.model` が既定（`gpt-5-mini`）。
+**期待**: `sources.ts_defaults=true` が含まれ、`effective.model_profiles.answer.model` が既定（`gpt-5.1`）。
 
 ---
 
@@ -72,23 +72,23 @@ grep -c '^Content-Length:' /tmp/mcp-smoke.out
 ## 4. 優先順位の検証（ENV > YAML > TS）
 ### 4-1 ENV 上書き
 ```bash
-MODEL_ANSWER="gpt-5-mini" node build/index.js --show-config 2> effective.json; cat effective.json | jq '.effective.model_profiles.answer.model'
+MODEL_ANSWER="gpt-5.1-chat-latest" node build/index.js --show-config 2> effective.json; cat effective.json | jq '.effective.model_profiles.answer.model'
 ```
-**期待**: `"gpt-5-mini"`
+**期待**: `"gpt-5.1-chat-latest"`
 
 ### 4-2 YAML の読み込み
 ```bash
 cat > /tmp/mcp-config.yaml <<'YAML'
 model_profiles:
   answer:
-    model: gpt-5-mini
-    reasoning_effort: medium
-    verbosity: medium
+    model: gpt-5.1-codex
+    reasoning_effort: high
+    verbosity: high
 YAML
 
 node build/index.js --show-config --config /tmp/mcp-config.yaml 2> effective.json; cat effective.json | jq '.sources, .effective.model_profiles.answer.model'
 ```
-**期待**: `.sources.yaml` が `/tmp/mcp-config.yaml` を指し、`"gpt-5-mini"`。
+**期待**: `.sources.yaml` が `/tmp/mcp-config.yaml` を指し、`"gpt-5.1-codex"`。
 
 ---
 
