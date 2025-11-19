@@ -1,7 +1,7 @@
 
 # 正準仕様（Canonical Spec）— `docs/spec.md`
 最終更新: 2025-08-24（Asia/Tokyo, AI確認）  
-バージョン: **v0.5.x**
+バージョン: **v0.7.x**
 
 本ドキュメントは **openai-responses-mcp** の**唯一の正準仕様**です。  
 実装・運用・テストは、必ず本仕様に合致していることを条件とします。
@@ -238,7 +238,7 @@ model_profiles:
 
 ## 4. モデル指示（System Policy）
 - **必須**：Responses API の `instructions` には **コード側SSOT（`src/policy/system-policy.ts` の `SYSTEM_POLICY`）**を**そのまま**与える（改変禁止）。
-- 版識別：`SYSTEM_POLICY_REV` を参照（例: `2025-08-09 v0.4.0`）。
+- 版識別：`SYSTEM_POLICY_REV` を参照（例: `2025-11-19 v0.7.0`）。
 - 役割：web_search の判断、出典・日付の扱い、相対日付の絶対化（Asia/Tokyo）、多言語（日本語優先）などを規定。
 
 ---

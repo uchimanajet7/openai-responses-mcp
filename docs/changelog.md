@@ -2,6 +2,11 @@
 
 本プロジェクトの変更履歴です。日付は Asia/Tokyo 基準です。
 
+## [0.7.0] - 2025-11-19
+- feat(config): `model_profiles.answer.model` の既定値を `gpt-5.1` へ更新し、Responses API で標準的に GPT-5.1 を利用。
+- docs: `docs/spec.md` / `docs/reference/*` / `README.*` / `docs/verification.md` など全体の設定例・期待値を `gpt-5.1` 系に刷新し、新バージョン表記へ統一。
+- config: `config/config.yaml.example` の `model_profiles` サンプルを `gpt-5.1` / `gpt-5.1-codex` / `gpt-5.1-chat-latest` に合わせて更新。
+
 ## [0.6.0] - 2025-08-27
 - feat(logging): デバッグ判定を単一化。CLI/ENV/YAML を同義化し、優先度を CLI > ENV > YAML に統一（起動時に最終決定→以降は isDebug() を参照）。
 - refactor(logging): `src/debug/state.ts` を追加し、stderr→ファイルTEEミラーを含むデバッグ出力経路を一元化。

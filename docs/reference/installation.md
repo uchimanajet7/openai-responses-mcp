@@ -119,7 +119,7 @@ MODEL_ANSWER=gpt-5.1 npx openai-responses-mcp --show-config 2> effective.json
 期待例（抜粋）:
 ```json
 {
-  "version": "0.4.0",
+  "version": "0.7.0",
   "sources": { "ts_defaults": true, "yaml": "./config/config.yaml", "env": ["MODEL_ANSWER"], "cli": [] },
   "effective": { "model_profiles": { "answer": { "model": "gpt-5.1", "reasoning_effort": "medium", "verbosity": "medium" } } }
 }

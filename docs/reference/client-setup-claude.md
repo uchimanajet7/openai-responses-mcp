@@ -101,7 +101,7 @@ model_profiles:
 ```http
 Content-Length: 157
 
-{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-06-18","capabilities":{"tools":{}},"serverInfo":{"name":"openai-responses-mcp","version":"0.4.0"}}}
+{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-06-18","capabilities":{"tools":{}},"serverInfo":{"name":"openai-responses-mcp","version":"0.7.0"}}}
 ```
 `tools`内に`answer`、`answer_detailed`、`answer_quick`の3つが表示されれば登録成功。
 
