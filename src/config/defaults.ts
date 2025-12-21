@@ -2,8 +2,8 @@ export type Transport = "stdio";
 
 export interface ModelProfile {
   model: string;
-  // OpenAI 公式: low | medium | high のみ（minimal は未サポート）
-  reasoning_effort: "low" | "medium" | "high";
+  // OpenAI API（reasoning.effort）: low | medium | high | xhigh（Extra high）
+  reasoning_effort: "low" | "medium" | "high" | "xhigh";
   verbosity: "low" | "medium" | "high";
 }
 
@@ -39,7 +39,7 @@ export const defaults: Config = {
   },
   model_profiles: {
     answer: {
-      model: "gpt-5.1",
+      model: "gpt-5.2",
       reasoning_effort: "medium",
       verbosity: "medium"
     }

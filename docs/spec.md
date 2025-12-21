@@ -1,7 +1,7 @@
 
 # 正準仕様（Canonical Spec）— `docs/spec.md`
-最終更新: 2025-08-24（Asia/Tokyo, AI確認）  
-バージョン: **v0.7.x**
+最終更新: 2025-12-21（Asia/Tokyo, AI確認）  
+バージョン: **v0.9.0**
 
 本ドキュメントは **openai-responses-mcp** の**唯一の正準仕様**です。  
 実装・運用・テストは、必ず本仕様に合致していることを条件とします。
@@ -87,7 +87,7 @@ Content-Length: 156
 ```http
 Content-Length: 204
 
-{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"answer\":\"...\",\"used_search\":false,\"citations\":[],\"model\":\"gpt-5.1\"}"}]}}
+{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"answer\":\"...\",\"used_search\":false,\"citations\":[],\"model\":\"gpt-5.2\"}"}]}}
 ```
 
 ### 2.6 ping（任意）
@@ -130,7 +130,7 @@ Claude Code等のMCPクライアントは、ユーザーの指示内容に基づ
 ```yaml
 model_profiles:
   answer:           # 必須プロファイル
-    model: gpt-5.1
+    model: gpt-5.2
     reasoning_effort: medium
     verbosity: medium
   answer_detailed:  # オプション（省略時はanswerで代替）
@@ -144,7 +144,7 @@ model_profiles:
 ```yaml
 model_profiles:
   answer:  # 必須のみ設定
-    model: gpt-5.1
+    model: gpt-5.2
     reasoning_effort: medium
     verbosity: medium
 # 全ツールがこの設定で動作
@@ -218,15 +218,16 @@ model_profiles:
   "used_search": true,
   "citations": [
     {
-      "url": "https://...",
+      "url": "https://...（URL）または oai-weather 等の情報源ID（URLが返らない場合）",
       "title": "string (optional)",
       "published_at": "YYYY-MM-DD (optional)"
     }
   ],
-  "model": "used model id (e.g., gpt-5.1)"
+  "model": "used model id (e.g., gpt-5.2)"
 }
 ```
-- **順序規約（回答本文側）**：本文 →（必要に応じて）箇条書き →（web_search 使用時のみ）`Sources:` で URL + ISO 日付を併記。
+- **順序規約（回答本文側）**：本文 →（必要に応じて）箇条書き →（web_search 使用時のみ）`Sources:` で **情報源 + ISO 日付**を併記。
+  - 情報源は **URL が取れる場合は URL**、取れない場合は `oai-weather` 等の **ソース識別子**（`web_search_call.action.sources` の `api` ソース等）を用いる。
 
 ### 3.3 検索判定
 - `used_search = true` とする条件：
@@ -238,7 +239,7 @@ model_profiles:
 
 ## 4. モデル指示（System Policy）
 - **必須**：Responses API の `instructions` には **コード側SSOT（`src/policy/system-policy.ts` の `SYSTEM_POLICY`）**を**そのまま**与える（改変禁止）。
-- 版識別：`SYSTEM_POLICY_REV` を参照（例: `2025-11-19 v0.7.0`）。
+- 版識別：`SYSTEM_POLICY_REV` を参照（例: `2025-12-21 v0.9.0`）。
 - 役割：web_search の判断、出典・日付の扱い、相対日付の絶対化（Asia/Tokyo）、多言語（日本語優先）などを規定。
 
 ---
@@ -266,7 +267,7 @@ responses: { stream: false, json_mode: false }
 
 model_profiles:
   answer:           # 必須・基準プロファイル
-    model: gpt-5.1
+    model: gpt-5.2
     reasoning_effort: medium
     verbosity: medium
     
@@ -276,8 +277,8 @@ model_profiles:
     verbosity: high
     
   answer_quick:     # オプション・高速回答用
-    model: gpt-5.1-chat-latest
-    reasoning_effort: minimal
+    model: gpt-5.2-chat-latest
+    reasoning_effort: low
     verbosity: low
 
 policy:
@@ -320,6 +321,7 @@ server: { transport: stdio, debug: false, debug_file: null, show_config_on_start
 ### 5.6 モデル互換性と機能適用範囲
 - `verbosity` の適用: モデルIDが `gpt-5` 系（接頭辞が `gpt-5`）のときのみ適用。
 - `reasoning_effort` の適用: `gpt-5` / `o3` / `o4` 系モデルで適用。それ以外では無視されるか、OpenAI側でエラーになり得る。
+- `reasoning_effort` の値: `low` / `medium`（既定） / `high` / `xhigh`（Extra high）。
 - 非対応モデルを指定した場合: OpenAI Responses API 側の検証でエラーとなる可能性があるため、対応モデルIDのみを指定すること。
 - マルチプロファイルの継承: `answer_detailed`/`answer_quick` が未定義の場合は `answer` の設定を継承して動作する（現行実装）。
 
@@ -334,12 +336,17 @@ server: { transport: stdio, debug: false, debug_file: null, show_config_on_start
    - `instructions`: System Policy（前述）
    - `input`: ユーザ `query`（必要なら追加ヒントに recency/domains を併記）
    - `tools`: `[{"type":"web_search"}]`（常時許可）
+   - `include`: `["web_search_call.action.sources"]`（検索で参照した **情報源一覧（URL または情報源ID）** を取得。`url_citation` が得られない場合のフォールバック、および「どこから検索したか」の補完に使用）
    - `text`: `{"verbosity": <profile.verbosity>}`（モデル対応時のみ）
    - `reasoning`: `{"effort": <profile.reasoning_effort>}`（モデル対応時のみ）
    - `timeout_ms`: 設定値
-5. **注釈解析**：`url_citation` 等から **URL / title / published_at** を抽出。
-6. **`used_search` 判定** と **`citations` 整形**（最大件数適用）。
-7. **応答 JSON 構築**（本文・`used_search`・`citations[]`・`model`）。
+5. **注釈解析**：Responses の `url_citation` 注釈から **URL / title** を抽出（優先）。併せて `web_search_call.action.sources`（`include` で取得）から **情報源（URL またはソース識別子）** を抽出し、`url_citation` が 0 件の場合は sources 由来を採用、`url_citation` がある場合も **URL 以外の情報源ID** を併記して「検索元」を落とさない。
+6. **`used_search` 判定** と **`citations` 整形**（最大件数適用）：
+   - `used_search=true` の条件は 3.3 に従う。
+   - `citations[]` は `url_citation` 由来を優先する。`url_citation` が 0 件の場合は `web_search_call.action.sources` 由来（URL/情報源ID）で補完し、`url_citation` がある場合も **URL 以外の情報源ID** は併記して「どこから検索したか」を維持する。
+   - 日付は、公開日が取れない場合は **アクセス日（Asia/Tokyo, ISO: `YYYY-MM-DD`）** を用いる。
+7. **応答 JSON 構築**（本文・`used_search`・`citations[]`・`model`）：
+   - `used_search=true` のとき、本文末尾に `Sources:`（情報源 + ISO日付）が存在しない場合は、サーバ側で `Sources:` を自動付与して出力契約（3.2）を満たす。
 8. **返送**：MCP レスポンスの `content[0].text` に **JSON 文字列**として格納。
 
 ---
@@ -421,9 +428,9 @@ server: { transport: stdio, debug: false, debug_file: null, show_config_on_start
 
 ## 10. 完了の定義（DoD）
 - 「HTTP 404 の意味」は `used_search=false`、`citations=[]` で返る。
-- 「本日 YYYY-MM-DD の東京の天気」は `used_search=true`、`citations.length>=1`、本文に URL + ISO 日付併記。
+- 「本日 YYYY-MM-DD の東京の天気」は `used_search=true`、`citations.length>=1`、本文に **情報源 + ISO 日付**（URL またはソース識別子）を併記。
 - `npm run mcp:smoke` が `initialize → tools/list → tools/call(answer)` の 3 応答を返す。
-- `scripts/mcp-smoke*.js` を含む社内スモークスクリプトは、`tools/call` の検索完了を待てるよう `child.kill()` まで **4000ms 以上**待機し、`answer`/`answer_quick` のレスポンス本文を実際に観測できること（強制終了で応答を潰さない）。
+- `scripts/mcp-smoke*.js` を含む社内スモークスクリプトは、`tools/call` の検索完了を待てるよう `child.kill()` まで **4000ms 以上**待機し、`answer`/`answer_detailed`/`answer_quick` のレスポンス本文を実際に観測できること（強制終了で応答を潰さない）。
 
 ---
 
@@ -457,7 +464,7 @@ server: { transport: stdio, debug: false, debug_file: null, show_config_on_start
 
 ### 15.1 必須項目
 - name: `openai-responses-mcp`
-- version: セマンティックバージョニング（現行 `0.4.x`）
+- version: セマンティックバージョニング（現行 `0.9.x`）
 - description: 以下の文言を使用（段階表現「Step N:」は含めない）
   - `Lightweight MCP server (Responses API core). OpenAI integration + web_search.`
 - type: `module`
@@ -478,7 +485,7 @@ server: { transport: stdio, debug: false, debug_file: null, show_config_on_start
 ```json
 {
   "name": "openai-responses-mcp",
-  "version": "0.4.1",
+  "version": "0.9.0",
   "description": "Lightweight MCP server (Responses API core). OpenAI integration + web_search.",
   "type": "module",
   "bin": { "openai-responses-mcp": "build/index.js" },
@@ -518,17 +525,17 @@ server: { transport: stdio, debug: false, debug_file: null, show_config_on_start
   "domains": ["jma.go.jp","tenki.jp"],
   "style": "summary",
   "verbosity": "medium",
-  "reasoning_effort": "minimal"
+  "reasoning_effort": "medium"
 }
 ```
 
 ### A.2 出力（tools/call ← content[0].text）
 ```json
 {
-  "answer": "2025-08-09（JST）の東京都の天気は……（略）。\n\nSources:\n- https://www.jma.go.jp/... (2025-08-09)",
+  "answer": "2025-08-09（JST）の東京都の天気は……（略）。\n\nSources:\n- oai-weather (2025-08-09)\n- https://www.jma.go.jp/... (2025-08-09)",
   "used_search": true,
-  "citations": [{"url":"https://www.jma.go.jp/...","title":"気象庁｜天気予報","published_at":"2025-08-09"}],
-  "model": "gpt-5.1"
+  "citations": [{"url":"oai-weather","title":"api","published_at":"2025-08-09"},{"url":"https://www.jma.go.jp/...","title":"気象庁｜天気予報","published_at":"2025-08-09"}],
+  "model": "gpt-5.2"
 }
 ```
 

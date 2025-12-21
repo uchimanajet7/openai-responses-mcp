@@ -33,6 +33,7 @@ OpenAI Responses API を推論コアに採用した軽量な MCP サーバです
 - Responses API 準拠（公式JS SDK `openai`）
 - 検索はモデルに委譲（`web_search` を常時許可）
 - 構造化出力（本文・`used_search`・`citations[]`・`model`）
+  - `citations[]` は **情報源**（URL または `oai-weather` 等の情報源ID）を返す
 - System Policy はコード内SSOT（`src/policy/system-policy.ts`）
 - MCP stdio 実装（`initialize`/`tools/list`/`tools/call`）
 
@@ -48,7 +49,7 @@ OpenAI Responses API を推論コアに採用した軽量な MCP サーバです
 - 起動例（npx）:
   - `export OPENAI_API_KEY="sk-..." && npx openai-responses-mcp@latest --stdio`
 
-YAML は後から追加可能です（既定パス: macOS/Linux `~/.config/openai-responses-mcp/config.yaml`、Windows `%APPDATA%\\openai-responses-mcp\\config.yaml`）。
+YAML は後から追加可能です（既定パス: macOS/Linux `~/.config/openai-responses-mcp/config.yaml`、Windows `%APPDATA%\openai-responses-mcp\config.yaml`）。
 
 ---
 
@@ -123,7 +124,7 @@ npx openai-responses-mcp@latest --stdio --debug ./_debug.log --config ~/.config/
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5.1
+    model: gpt-5.2
     reasoning_effort: medium
     verbosity: medium
 
@@ -179,7 +180,8 @@ node build/index.js --stdio --debug ./_debug.log
 
 ### 4) デモ（OpenAIへの問い合わせサンプル）
 ```bash
-npm run mcp:quick -- "今日の東京の気温"
+npm run mcp:quick -- "今日の東京の気温"   # answer_quick
+npm run mcp:answer -- "今日の東京の気温"  # answer
 npm run mcp:smoke:ldjson   # NDJSON互換の疎通確認
 ```
 

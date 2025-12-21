@@ -1,7 +1,7 @@
 
 # 検証手順（E2E）— openai-responses-mcp
 
-最終更新: 2025-08-15（Asia/Tokyo, AI確認）  
+最終更新: 2025-12-19（Asia/Tokyo, AI確認）  
 このファイルはローカルでの再現・確認手順を示します。出力は **JSON を機械的に検査**できる形を優先し、`jq` での確認例も併記します。
 
 ---
@@ -29,7 +29,7 @@ node build/index.js --help
 # 素の状態
 node build/index.js --show-config 2> effective.json; cat effective.json | jq '.version, .sources, .effective.model_profiles.answer.model'
 ```
-**期待**: `sources.ts_defaults=true` が含まれ、`effective.model_profiles.answer.model` が既定（`gpt-5.1`）。
+**期待**: `sources.ts_defaults=true` が含まれ、`effective.model_profiles.answer.model` が既定（`gpt-5.2`）。
 
 ---
 
@@ -72,9 +72,9 @@ grep -c '^Content-Length:' /tmp/mcp-smoke.out
 ## 4. 優先順位の検証（ENV > YAML > TS）
 ### 4-1 ENV 上書き
 ```bash
-MODEL_ANSWER="gpt-5.1-chat-latest" node build/index.js --show-config 2> effective.json; cat effective.json | jq '.effective.model_profiles.answer.model'
+MODEL_ANSWER="gpt-5.2-chat-latest" node build/index.js --show-config 2> effective.json; cat effective.json | jq '.effective.model_profiles.answer.model'
 ```
-**期待**: `"gpt-5.1-chat-latest"`
+**期待**: `"gpt-5.2-chat-latest"`
 
 ### 4-2 YAML の読み込み
 ```bash
@@ -105,12 +105,25 @@ OPENAI_API_TIMEOUT=10 npm run mcp:smoke | sed -n '1,120p'
 ## 6. 失敗時の切り分け
 - `Missing API key: set OPENAI_API_KEY` → 環境変数未設定
 - `ECONNRESET` / `AbortError` → ネットワーク/タイムアウト
-- `Unknown tool` → `tools/call` の name ミス（`answer` のみ対応）
+- `Unknown tool` → `tools/call` の name ミス（`answer` / `answer_detailed` / `answer_quick` のみ対応）
 
 ---
 
 ## 7. 成功判定（DoD 準拠）
-- 1・2・4 の各検証が**期待どおり**になれば要件を満たしています。
+- 1・2・4 の各検証が**期待どおり**であることに加え、DoD（`docs/spec.md`）の代表ケースが満たされていること。
+- 安定知識（例）:
+  - 「HTTP 404 の意味」→ `used_search=false`、`citations=[]`
+- 時事系（例, 要 `OPENAI_API_KEY`）:
+  - 「本日 YYYY-MM-DD の東京の天気」→ `used_search=true`、`citations.length>=1`、本文に `Sources:`（情報源 + ISO日付 `YYYY-MM-DD`）が併記されていること（情報源は URL または `oai-weather` 等の情報源ID）
+
+### 7-1 観測用（簡易）
+`answer_quick`（既定）/`answer` を叩いてレスポンス本文を観測します（出力は `scripts/mcp-smoke-apikey.js` が表示）。
+```bash
+export OPENAI_API_KEY="sk-..."
+npm run mcp:quick -- "本日 YYYY-MM-DD の東京の天気"   # answer_quick
+npm run mcp:answer -- "本日 YYYY-MM-DD の東京の天気"  # answer
+```
+**期待**: `[tools/call result]` の JSON（`content[0].text` 内）で、`citations` が 1 件以上になり、`answer` 本文に `Sources:` が含まれる。
 
 ---
 

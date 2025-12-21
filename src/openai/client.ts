@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import type { ResponseIncludable } from "openai/resources/responses/responses";
 import { isDebug } from "../debug/state.js";
 import { Config } from "../config/defaults.js";
 
@@ -23,6 +24,10 @@ export type CallArgs = {
   instructions?: string;
   input: any;
   tools?: any[];
+  include?: ResponseIncludable[] | null;
+  // Responses API（モデル対応時のみ付与される想定）
+  text?: any;
+  reasoning?: any;
 };
 
 export async function callResponsesWithRetry(

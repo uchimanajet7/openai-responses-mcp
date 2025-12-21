@@ -76,7 +76,7 @@ openai-responses-mcp/
 
 ## 7. DoD（現在の要件）
 - HTTP 404 → `used_search=false`, `citations=[]`
-- 本日 YYYY-MM-DD の東京の天気 → `used_search=true`、本文に URL + ISO 日付、`citations>=1`
+- 本日 YYYY-MM-DD の東京の天気 → `used_search=true`、本文に **情報源 + ISO 日付**（URL または情報源ID）、`citations>=1`
 
 
 ---

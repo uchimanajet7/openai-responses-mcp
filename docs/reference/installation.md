@@ -1,6 +1,6 @@
 
 # インストール手順（ローカル / npm）— `docs/reference/installation.md`
-最終更新: 2025-08-15（Asia/Tokyo, AI確認）
+最終更新: 2025-12-20（Asia/Tokyo, AI確認）
 
 本ドキュメントは **openai-responses-mcp** をローカル環境で構築・利用するための**完全な手順**を記載します。  
 **npm 固定**（pnpm/yarn は扱いません）。MCP クライアント（Claude）側の登録は別紙 `client-setup-claude.md` を参照。
@@ -91,7 +91,7 @@ YAML は**任意**です。無くても動作します（TS 既定 + ENV/CLI）�
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5.1
+    model: gpt-5.2
     reasoning_effort: medium
     verbosity: medium
 
@@ -113,15 +113,15 @@ node build/index.js --help
 # 実効設定の確認（sources に反映元が出る）
 npx openai-responses-mcp --show-config 2> effective.json
 npx openai-responses-mcp --show-config --config ./config/config.yaml 2> effective.json
-MODEL_ANSWER=gpt-5.1 npx openai-responses-mcp --show-config 2> effective.json
+MODEL_ANSWER=gpt-5.2 npx openai-responses-mcp --show-config 2> effective.json
 ```
 
 期待例（抜粋）:
 ```json
 {
-  "version": "0.7.0",
+  "version": "0.9.0",
   "sources": { "ts_defaults": true, "yaml": "./config/config.yaml", "env": ["MODEL_ANSWER"], "cli": [] },
-  "effective": { "model_profiles": { "answer": { "model": "gpt-5.1", "reasoning_effort": "medium", "verbosity": "medium" } } }
+  "effective": { "model_profiles": { "answer": { "model": "gpt-5.2", "reasoning_effort": "medium", "verbosity": "medium" } } }
 }
 ```
 

@@ -33,6 +33,7 @@ Important: The canonical specification is `docs/spec.md`. See that file for deta
 - Responses API compliant (official JS SDK `openai`)
 - Search is delegated to the model (always permit `web_search`)
 - Structured output (body, `used_search`, `citations[]`, `model`)
+  - `citations[]` returns **sources** (URLs, or source IDs such as `oai-weather` when no public URL is provided)
 - System Policy as code SSOT (`src/policy/system-policy.ts`)
 - MCP stdio implementation (`initialize`/`tools/list`/`tools/call`)
 
@@ -48,7 +49,7 @@ Important: The canonical specification is `docs/spec.md`. See that file for deta
 - Example startup (npx):
   - `export OPENAI_API_KEY="sk-..." && npx openai-responses-mcp@latest --stdio`
 
-You can add YAML later (default path: macOS/Linux `~/.config/openai-responses-mcp/config.yaml`, Windows `%APPDATA%\\openai-responses-mcp\\config.yaml`).
+You can add YAML later (default path: macOS/Linux `~/.config/openai-responses-mcp/config.yaml`, Windows `%APPDATA%\openai-responses-mcp\config.yaml`).
 
 ---
 
@@ -123,7 +124,7 @@ Minimal example:
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5.1
+    model: gpt-5.2
     reasoning_effort: medium
     verbosity: medium
 
@@ -179,7 +180,8 @@ node build/index.js --stdio --debug ./_debug.log
 
 ### 4) Demo (sample query to OpenAI)
 ```bash
-npm run mcp:quick -- "今日の東京の気温"
+npm run mcp:quick -- "今日の東京の気温"   # answer_quick
+npm run mcp:answer -- "今日の東京の気温"  # answer
 npm run mcp:smoke:ldjson   # NDJSON-compatible connectivity check
 ```
 

@@ -2,6 +2,23 @@
 
 本プロジェクトの変更履歴です。日付は Asia/Tokyo 基準です。
 
+## [Unreleased]
+
+## [0.9.0] - 2025-12-21
+- breaking: `citations[].url` は URL だけでなく、`oai-weather` 等の **情報源ID** を含み得る（「どこから検索したか」の証跡として採用）。
+- fix(answer): `web_search_call` があるのに `url_citation` が 0 件で `citations=[]` になるケースを、`include:["web_search_call.action.sources"]` 由来の情報源（URL/情報源ID）で補完して解消。加えて `url_citation` が存在する場合も、URL が返らない `api` ソース（例: `oai-weather`）の情報源IDは併記して「どこから検索したか」を落とさない。
+- fix(answer): `used_search=true` 時に本文へ `Sources:`（情報源 + ISO日付）を不足時にサーバ側で自動付与し、出力契約（DoD）を安定化（情報源は URL または情報源ID）。
+- feat(smoke): `scripts/mcp-smoke-apikey.js` に `--tool`（`answer`/`answer_quick`/`answer_detailed`）を追加し、`npm run mcp:answer` で `answer` を簡単に呼べるようにした（`answer_quick` との比較を容易化）。
+- docs: 上記仕様（Sources=情報源、apiソース対応、Sources 自動付与）を `docs/spec.md` / `docs/reference/system-policy.md` / `docs/verification.md` / `docs/README.md` に反映。
+
+## [0.8.0] - 2025-12-20
+- feat(config): `model_profiles.answer.model` の既定値を `gpt-5.2` へ更新。
+- feat(config): `reasoning_effort` に Extra high（API表記 `xhigh`）を追加し、`low`/`medium`/`high`/`xhigh` を許容。
+- deps: OpenAI JS SDK `openai` を `^6.15.0` へ更新（`xhigh` を型定義に反映）。
+- fix(protocol): `@types/node` の型変更に合わせ、stdin の chunk を Buffer に正規化して TypeScript ビルドを安定化。
+- fix(cli): `--help` の Windows 既定パス表記でバックスラッシュが欠落する問題を修正。
+- fix(smoke): `mcp:quick` が `tools/call(answer_quick)` の応答を受け取るまで待機して終了するよう改善（web_search で 4 秒超となるケースに対応）。
+
 ## [0.7.0] - 2025-11-19
 - feat(config): `model_profiles.answer.model` の既定値を `gpt-5.1` へ更新し、Responses API で標準的に GPT-5.1 を利用。
 - docs: `docs/spec.md` / `docs/reference/*` / `README.*` / `docs/verification.md` など全体の設定例・期待値を `gpt-5.1` 系に刷新し、新バージョン表記へ統一。

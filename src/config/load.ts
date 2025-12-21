@@ -46,7 +46,7 @@ function applyEnv(cfg: Config, env: NodeJS.ProcessEnv): Config {
   }
   if (env.ANSWER_EFFORT) {
     const v = String(env.ANSWER_EFFORT).toLowerCase();
-    if (v === 'low' || v === 'medium' || v === 'high') (copy.model_profiles.answer as any).reasoning_effort = v;
+    if (v === 'low' || v === 'medium' || v === 'high' || v === 'xhigh') (copy.model_profiles.answer as any).reasoning_effort = v;
   }
   if (env.ANSWER_VERBOSITY) {
     const v = String(env.ANSWER_VERBOSITY).toLowerCase();
@@ -138,14 +138,14 @@ export function loadConfig(opts: LoadOptions): Loaded {
 }
 
 function validateConfig(cfg: Config): void {
-  const allowedEffort = new Set(["low", "medium", "high"]);
+  const allowedEffort = new Set(["low", "medium", "high", "xhigh"]);
   const profiles = cfg.model_profiles as any;
   for (const name of Object.keys(profiles)) {
     const p = profiles[name];
     if (!p) continue;
     const eff = p.reasoning_effort as string;
     if (!allowedEffort.has(eff)) {
-      throw new Error(`Invalid model_profiles.${name}.reasoning_effort: ${eff} (allowed: low|medium|high)`);
+      throw new Error(`Invalid model_profiles.${name}.reasoning_effort: ${eff} (allowed: low|medium|high|xhigh)`);
     }
   }
 }

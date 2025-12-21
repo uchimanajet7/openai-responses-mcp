@@ -59,7 +59,7 @@ Usage:
 
 Notes:
   - Priority: CLI > ENV > YAML > TS defaults
-  - Default YAML path: ~/.config/openai-responses-mcp/config.yaml (or %APPDATA%\openai-responses-mcp\config.yaml on Windows)
+  - Default YAML path: ~/.config/openai-responses-mcp/config.yaml (or %APPDATA%\\openai-responses-mcp\\config.yaml on Windows)
 `);
 }
 

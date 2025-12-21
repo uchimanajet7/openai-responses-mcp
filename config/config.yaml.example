@@ -23,7 +23,7 @@ request:
 model_profiles:
   # 必須・基準プロファイル（未設定時は起動エラー）
   answer:
-    model: gpt-5.1
+    model: gpt-5.2
     reasoning_effort: medium
     verbosity: medium
 
@@ -35,14 +35,14 @@ model_profiles:
 
   # オプション・高速回答用（未設定時はanswerで代替）
   answer_quick:
-    model: gpt-5.1-chat-latest
+    model: gpt-5.2-chat-latest
     reasoning_effort: low
     verbosity: low
 
 # 最小設定例：answerのみ設定して全ツールを同じ設定で使用
 # model_profiles:
 #   answer:
-#     model: gpt-5.1
+#     model: gpt-5.2
 #     reasoning_effort: medium
 #     verbosity: medium
 # # answer_detailed, answer_quick は省略 → answer の設定で動作

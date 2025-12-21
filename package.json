@@ -1,6 +1,6 @@
 {
   "name": "openai-responses-mcp",
-  "version": "0.7.0",
+  "version": "0.9.0",
   "description": "Lightweight MCP server (Responses API core). OpenAI integration + web_search.",
   "type": "module",
   "bin": {
@@ -23,7 +23,8 @@
     "mcp:smoke": "node scripts/mcp-smoke.js",
     "mcp:smoke:ldjson": "node scripts/mcp-smoke-ldjson.js",
     "mcp:smoke:ping": "node scripts/mcp-smoke-ping.js",
-    "mcp:quick": "node scripts/mcp-smoke-quick.js",
+    "mcp:quick": "node scripts/mcp-smoke-apikey.js",
+    "mcp:answer": "node scripts/mcp-smoke-apikey.js --tool answer",
     "prepublishOnly": "npm run build",
     "test": "npm run build && node scripts/test-tools-list.js && node scripts/test-cancel-noinflight.js && node scripts/test-cancel-during-call.js",
     "test:tools-list": "node scripts/test-tools-list.js",
@@ -31,13 +32,13 @@
     "test:cancel-during-call": "node scripts/test-cancel-during-call.js"
   },
   "dependencies": {
-    "openai": "^5.10.2",
-    "yaml": "^2.5.0"
+    "openai": "^6.15.0",
+    "yaml": "^2.8.2"
   },
   "devDependencies": {
-    "@types/node": "^22.5.0",
-    "tsx": "^4.20.0",
-    "typescript": "^5.5.0"
+    "@types/node": "^25.0.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=20"

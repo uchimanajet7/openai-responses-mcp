@@ -1,6 +1,6 @@
 
 # System Policy — 参照先（SSOT: コード）
-最終更新: 2025-08-09（Asia/Tokyo）
+最終更新: 2025-12-21（Asia/Tokyo）
 
 本プロジェクトでは System Policy のソース・オブ・トゥルース（SSOT）を**コード側**に一本化しています。Responses API の `instructions` には、コードに定義された定数を**そのまま**与えます。
 
@@ -46,8 +46,12 @@ Tips:
 ## 5. 出力契約（サーバ実装が依拠する仕様）
 - 本文（自然文）→ 箇条書き（根拠/手順）→ **Sources:**（web_search 使用時のみ） の順。
 - 検索未使用時は **Sources を出さない**。
-- MCP レスポンスの `citations[]` には `{url, title?, published_at?}` を格納。`published_at` は ISO 文字列または `null`/省略。
+- MCP レスポンスの `citations[]` には `{url, title?, published_at?}` を格納。
+  - `url` は **URL（取得できる場合）**、または **情報源ID**（例: `oai-weather` のような `api` ソースで URL が返らない場合）を格納する。
+  - `published_at` は ISO 文字列または `null`/省略。
 - `used_search` は `url_citation` を 1 件以上得た、または `web_search_call` を含む場合に `true`。
+- `citations[]` は `url_citation` 由来（URL）を優先する。併せて `web_search_call.action.sources`（`include` で取得）から **情報源（URL または情報源ID）** を抽出し、`url_citation` が 0 件の場合は sources 由来を採用、`url_citation` がある場合も **URL 以外の情報源ID** は併記して「検索元」を落とさない。
+- `used_search=true` のとき本文に `Sources:` が欠けている場合は、サーバ側で `Sources:`（情報源 + ISO 日付）を自動付与して出力契約を満たす。
 
 ---
 
@@ -65,6 +69,7 @@ Tips:
 
 ## 8. 実装上の期待（MCP サーバが前提とする動作）
 - Responses API には **毎回** `tools: [{type:"web_search"}]` を渡す。
+- `include: ["web_search_call.action.sources"]` を付与し、検索で参照した **情報源一覧（URL または情報源ID）** を取得できるようにする（`url_citation` が返らない場合のフォールバック、および「どこから検索したか」の補完用）。
 - `instructions` は本ファイルの **2章の文面**をそのまま与える（改変禁止）。
 - `policy.max_citations` 等の閾値は設定（TS defaults / YAML / ENV / CLI）で制御可能。
 
@@ -72,4 +77,4 @@ Tips:
 
 ## 9. テスト観点（DoD 抜粋）
 - 「HTTP 404 の意味」→ `used_search=false`、`citations=[]`。
-- 「本日 YYYY-MM-DD の東京の天気」→ `used_search=true`、`citations>=1`、本文中に URL + ISO 日付併記。
+- 「本日 YYYY-MM-DD の東京の天気」→ `used_search=true`、`citations>=1`、本文中に **情報源 + ISO 日付**（URL または情報源ID）を併記。

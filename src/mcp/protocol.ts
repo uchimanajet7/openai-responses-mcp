@@ -39,13 +39,14 @@ export function readMessages(onMessage: (msg: JsonRpcMessage) => void): void {
   } catch {}
 
   stdin.on("data", (chunk) => {
+    const chunkBuf = typeof chunk === "string" ? Buffer.from(chunk, "utf8") : chunk;
     if (isDebug()) {
       try {
-        const preview = chunk.toString("utf8").replace(/\r/g, "<CR>").replace(/\n/g, "<LF>");
-        console.error(`[mcp] stdin chunk=${chunk.length} preview="${preview.slice(0, 200)}"`);
+        const preview = chunkBuf.toString("utf8").replace(/\r/g, "<CR>").replace(/\n/g, "<LF>");
+        console.error(`[mcp] stdin chunk=${chunkBuf.length} preview="${preview.slice(0, 200)}"`);
       } catch {}
     }
-    buffer = Buffer.concat([buffer, chunk]);
+    buffer = Buffer.concat([buffer, chunkBuf]);
     while (true) {
       // ヘッダ終端を検出（CRLFCRLF 優先、無ければ LFLF も許容）
       let headerEnd = buffer.indexOf("\r\n\r\n");

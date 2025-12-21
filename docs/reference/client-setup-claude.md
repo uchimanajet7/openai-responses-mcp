@@ -1,6 +1,6 @@
 
 # Claude Code / Claude Desktop 連携手順 — `docs/reference/client-setup-claude.md`
-最終更新: 2025-08-09（Asia/Tokyo）
+最終更新: 2025-12-20（Asia/Tokyo, AI確認）
 
 本ドキュメントは **openai-responses-mcp**（stdio）を Claude 系クライアントに登録して利用するための、
 実務向けの完全手順です。**要約なし**。クライアント固有の設定ファイル位置はバージョンで変わるため、
@@ -40,7 +40,7 @@ Claude 系クライアント（Claude Code / Claude Desktop）は、共通して
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5.1
+    model: gpt-5.2
     reasoning_effort: medium
     verbosity: medium
   answer_detailed:
@@ -48,7 +48,7 @@ model_profiles:
     reasoning_effort: high
     verbosity: high
   answer_quick:
-    model: gpt-5.1-chat-latest
+    model: gpt-5.2-chat-latest
     reasoning_effort: low
     verbosity: low
 ```
@@ -101,7 +101,7 @@ model_profiles:
 ```http
 Content-Length: 157
 
-{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-06-18","capabilities":{"tools":{}},"serverInfo":{"name":"openai-responses-mcp","version":"0.7.0"}}}
+{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-06-18","capabilities":{"tools":{}},"serverInfo":{"name":"openai-responses-mcp","version":"0.9.0"}}}
 ```
 `tools`内に`answer`、`answer_detailed`、`answer_quick`の3つが表示されれば登録成功。
 

@@ -1,6 +1,6 @@
 
 # 設定リファレンス — `docs/reference/config-reference.md`
-最終更新: 2025-08-15（Asia/Tokyo, AI確認）
+最終更新: 2025-12-19（Asia/Tokyo, AI確認）
 
 本ドキュメントは **openai-responses-mcp** の設定仕様を完全記述します。  
 設定の**優先順位**は **CLI > ENV > YAML > TS defaults**（後勝ち、オブジェクトは深いマージ／配列は置換）。
@@ -38,15 +38,15 @@ openai:
 # マルチプロファイル設定
 model_profiles:
   answer:                          # 基準ツール（必須）
-    model: string                  # 例: gpt-5.1
-    reasoning_effort: string       # low|medium|high（推奨）
+    model: string                  # 例: gpt-5.2
+    reasoning_effort: string       # low|medium|high|xhigh（推奨）
     verbosity: string              # low|medium|high
   answer_detailed:                 # 詳細分析（オプション）
     model: string                  # 例: gpt-5.1-codex
     reasoning_effort: string
     verbosity: string
   answer_quick:                    # 高速回答（オプション）
-    model: string                  # 例: gpt-5.1-chat-latest
+    model: string                  # 例: gpt-5.2-chat-latest
     reasoning_effort: string
     verbosity: string
 
@@ -87,7 +87,7 @@ openai:
 
 # マルチプロファイル既定値
 model_profiles:
-  answer: { model: gpt-5.1, reasoning_effort: medium, verbosity: medium }
+  answer: { model: gpt-5.2, reasoning_effort: medium, verbosity: medium }
 
 request: { timeout_ms: 300000, max_retries: 3 }
 
@@ -110,7 +110,7 @@ server: { transport: stdio, debug: false, debug_file: null, show_config_on_start
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5.1
+    model: gpt-5.2
     reasoning_effort: medium
     verbosity: medium
 ```
@@ -128,11 +128,11 @@ model_profiles:
     reasoning_effort: high
     verbosity: high
   answer:
-    model: gpt-5.1
+    model: gpt-5.2
     reasoning_effort: medium
     verbosity: medium
   answer_quick:
-    model: gpt-5.1-chat-latest
+    model: gpt-5.2-chat-latest
     reasoning_effort: low
     verbosity: low
 
@@ -174,7 +174,7 @@ server:
 | `MAX_CITATIONS` | integer | `policy.max_citations` | 1..10 |
 | `DEBUG` | 1/true/path | `server.debug`/`server.debug_file` | `1|true` でON、`<path>` でファイルにTEEミラー |
 | `MODEL_ANSWER` | string | `model_profiles.answer.model` | クイック上書き（恒久はYAMLで設定） |
-| `ANSWER_EFFORT` | enum | `model_profiles.answer.reasoning_effort` | `low`/`medium`/`high` |
+| `ANSWER_EFFORT` | enum | `model_profiles.answer.reasoning_effort` | `low`/`medium`/`high`/`xhigh` |
 | `ANSWER_VERBOSITY` | enum | `model_profiles.answer.verbosity` | `low`/`medium`/`high` |
 
 > `openai.api_key_env` を `MY_KEY` に変えた場合、**`MY_KEY`** を設定してください。`OPENAI_API_KEY` は見られません。
@@ -213,7 +213,7 @@ node build/index.js --show-config 2> effective-config.json
   },
   "effective": {
     "openai": { "api_key_env": "OPENAI_API_KEY", "base_url": "https://api.openai.com/v1" },
-    "model_profiles": { "answer": { "model": "gpt-5.1", "reasoning_effort": "medium", "verbosity": "medium" } },
+    "model_profiles": { "answer": { "model": "gpt-5.2", "reasoning_effort": "medium", "verbosity": "medium" } },
     "request": { "timeout_ms": 300000, "max_retries": 3 },
     
     "policy": { "prefer_search_when_unsure": true, "max_citations": 3, "require_dates_iso": true },

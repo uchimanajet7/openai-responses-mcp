@@ -1,6 +1,6 @@
 
 # 環境セットアップ（ローカル開発・再現性）— `docs/reference/environment-setup.md`
-最終更新: 2025-08-15（Asia/Tokyo, AI確認）
+最終更新: 2025-12-19（Asia/Tokyo, AI確認）
 
 本ドキュメントは **openai-responses-mcp** をローカルで安定稼働させるための環境準備を、OS 別に具体化した手順です。  
 **npm 固定**。beta/alpha ツールは使いません。
@@ -124,7 +124,7 @@ YAML は任意。無くても動きます。置く場合の既定パス：
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5.1
+    model: gpt-5.2
     reasoning_effort: medium
     verbosity: medium
 ```
