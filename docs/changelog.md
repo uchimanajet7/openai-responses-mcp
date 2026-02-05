@@ -2,14 +2,14 @@
 
 本プロジェクトの変更履歴です。日付は Asia/Tokyo 基準です。
 
-## [Unreleased]
-- breaking: tools/list の入力スキーマから `style` を削除
+## [0.10.0] - 2026-02-05
 - 依存更新: `openai` を `6.16.0` から `6.17.0` に更新
 - 依存更新: `@types/node` を `25.0.10` から `25.2.0` に更新
 - ドキュメント: `README.en.md` を削除し、`README.md` の英語リンクを削除
 - ドキュメント: `docs/reference/reproducibility.md` の `sources.env` 記述を実装に合わせて修正
 - ドキュメント: `docs/verification.md` に `jq` の前提を追記
 - ドキュメント: `docs/reference/installation.md` の配置場所記述を修正
+- breaking: tools/list の入力スキーマから `style` を削除
 
 ## [0.9.0] - 2025-12-21
 - breaking: `citations[].url` は URL だけでなく、`oai-weather` 等の **情報源ID** を含み得る（「どこから検索したか」の証跡として採用）。
