@@ -1,19 +1,15 @@
 # openai-responses-mcp
 
-<div align="center">
-  <p><a href="./README.en.md">English</a></p>
-</div>
-
 OpenAI Responses API を推論コアに採用した軽量な MCP サーバです。  
-`web_search` を常時許可し、実際に検索を行うかはモデルが自律判断します。Claude Code/Claude Desktop 等の MCP クライアントから stdio で利用します。
+`web_search` を常時許可し、実際に検索を行うかはモデルが自律判断します。Claude Code 等の MCP クライアントから stdio で利用します。
 
-重要: 仕様の正準は `docs/spec.md` です。詳細はそちらを参照してください。
+重要: 仕様・挙動は実装が正です。まず `docs/spec.md` を読んでください。
 
 ---
 
 ## Repository Structure
 - `src/`                         : TypeScript ソース
-- `scripts/`                     : 検証/補助スクリプト（`mcp-smoke*`, `clean.js` 等）
+- `scripts/`                     : 検証/補助スクリプト。例: `mcp-smoke*`, `clean.js`
 - `config/`
   - `config.yaml.example`        : 設定サンプル
   - `policy.md.example`          : 外部 System Policy のサンプル
@@ -29,31 +25,31 @@ OpenAI Responses API を推論コアに採用した軽量な MCP サーバです
 
 ---
 
-## 特長（概要）
+## 特長
 - Responses API 準拠（公式JS SDK `openai`）
 - 検索はモデルに委譲（`web_search` を常時許可）
-- 構造化出力（本文・`used_search`・`citations[]`・`model`）
+- 構造化出力（`answer`（本文）・`used_search`・`citations[]`・`model`）
   - `citations[]` は **情報源**（URL または `oai-weather` 等の情報源ID）を返す
-- System Policy はコード内SSOT（`src/policy/system-policy.ts`）
+- System Policy の参照先: `src/policy/system-policy.ts`
 - MCP stdio 実装（`initialize`/`tools/list`/`tools/call`）
 
 ## 要件
-- Node.js v20 以上（推奨: v24）
+- Node.js: 必須は v20 以上。動作確認は v24 系。
 - npm（Node 同梱）
 - OpenAI API キー（環境変数で渡す）
 
 ---
 
-## 最小構成（必須設定だけで起動）
-- 必須設定: 環境変数 `OPENAI_API_KEY` のみ（YAMLは不要）
-- 起動例（npx）:
+## 必須設定だけで起動できる最小構成
+- 必須設定: 環境変数 `OPENAI_API_KEY` のみ。YAML は不要。
+- 起動例:
   - `export OPENAI_API_KEY="sk-..." && npx openai-responses-mcp@latest --stdio`
 
-YAML は後から追加可能です（既定パス: macOS/Linux `~/.config/openai-responses-mcp/config.yaml`、Windows `%APPDATA%\openai-responses-mcp\config.yaml`）。
+YAML は任意です。使う場合の既定パスは `~/.config/openai-responses-mcp/config.yaml` です。
 
 ---
 
-## 利用者向け（MCPとして使う）
+## MCPとして使う
 MCPクライアントから利用する場合に参考にしてください。
 
 ### 1) Claude Code への登録例
@@ -71,7 +67,7 @@ MCPクライアントから利用する場合に参考にしてください。
 }
 ```
 
-- `claude code cli` で以下を実行
+- Claude Code CLI では以下を実行
 
 ```sh
 claude mcp add -s user -t stdio openai-responses -e OPENAI_API_KEY=sk-xxxx -- npx openai-responses-mcp@latest --stdio
@@ -116,8 +112,8 @@ export OPENAI_API_KEY="sk-..."
 npx openai-responses-mcp@latest --stdio --debug ./_debug.log --config ~/.config/openai-responses-mcp/config.yaml
 ```
 
-### 5) 設定（YAML 任意）
-既定パス: macOS/Linux `~/.config/openai-responses-mcp/config.yaml`、Windows `%APPDATA%\openai-responses-mcp\config.yaml`
+### 5) 設定（YAML は任意）
+既定パス: `~/.config/openai-responses-mcp/config.yaml`
 
 最小例:
 
@@ -134,7 +130,7 @@ request:
 ```
 サンプル: `config/config.yaml.example`
 
-外部 policy（任意）:
+外部 policy は任意です。
 
 ```yaml
 policy:
@@ -146,13 +142,13 @@ policy:
 サンプル: `config/policy.md.example`
 
 ### 6) ログとデバッグ
-- デバッグON（画面出力）: `--debug` / `DEBUG=1|true` / YAML `server.debug: true`（優先度: CLI > ENV > YAML, 単一判定）
-- デバッグON（ファイル＋画面ミラー）: `--debug ./_debug.log` または `DEBUG=./_debug.log`
+- デバッグON: `--debug` / `DEBUG=1|true` / YAML `server.debug: true`。stderr に出力する。送受信 JSON が出力されるため回答本文が含まれる。優先度は CLI > ENV > YAML。
+- デバッグON: ファイルへも出力する。 `--debug ./_debug.log` または `DEBUG=./_debug.log`
 - デバッグOFF: 最小限の稼働確認ログのみ
 
-補足（YAMLでの制御）:
-- `server.debug: true|false`（YAMLのみでも全モジュールに反映）
-- `server.debug_file: <path|null>`（指定時は stderr をファイルへTEEミラー）
+YAMLでの制御:
+- `server.debug: true|false`。YAMLだけでも全モジュールに反映する。
+- `server.debug_file: <path|null>`。`server.debug: true` のときにのみ有効で、stderr をファイルへTEEミラーする。
 
 ---
 
@@ -160,7 +156,7 @@ policy:
 
 ### 1) 取得とビルド
 ```bash
-git clone https://github.com/<your-org>/openai-responses-mcp.git
+git clone https://github.com/uchimanajet7/openai-responses-mcp.git
 cd openai-responses-mcp
 npm i
 npm run build
@@ -168,8 +164,8 @@ npm run build
 
 ### 2) スモークテスト（MCPフレーミング）
 ```bash
-npm run mcp:smoke | tee /tmp/mcp-smoke.out
-grep -c '^Content-Length:' /tmp/mcp-smoke.out   # 3 以上でOK
+npm run mcp:smoke | tee ./mcp-smoke.out
+grep -c '^Content-Length:' ./mcp-smoke.out   # 3 以上でOK
 ```
 
 ### 3) ローカル起動（stdio）
@@ -196,8 +192,8 @@ npm run mcp:smoke:ldjson   # NDJSON互換の疎通確認
 
 ### npm パッケージ確認と公開
 ```bash
-npm pack --dry-run    # 同梱物を確認（build/ と README/LICENSE/サンプルのみ）
-npm publish           # 公開（スコープなし）
+npm pack --dry-run    # 同梱物を確認。build/ と README.md と LICENSE と package.json と config/*.example
+git tag vX.Y.Z && git push --tags   # GitHub Actions で公開。release.yml が実行される
 ```
 
 ---
@@ -212,9 +208,3 @@ npm publish           # 公開（スコープなし）
 
 ## ライセンス
 MIT
-
-## Notes
-
-<p><a href="https://uchimanajet7.hatenablog.com/entry/2025/08/21/203000
-">openai-responses-mcp 開発メモ - Codex と Claude Code を両方使って作ってみた
-</a></p>

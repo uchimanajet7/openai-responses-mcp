@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // テスト目的: tools/call 実行直後に notifications/cancelled を送り、
-// 当該 id の result/error が出力されない（抑止される）ことを確認するスモーク。
-// OPENAI_API_KEY が未設定の場合はスキップ（exit 0）。
+// 当該 id の result/error が出力されないことを確認するスモーク。応答は抑止される。
+// OPENAI_API_KEY が未設定の場合はスキップする。exit 0。
 
 import { spawn } from 'node:child_process';
 
@@ -44,7 +44,7 @@ setTimeout(() => {
   }, 40);
 }, 80);
 
-// 3) 観測用の時間をおいて終了（抑止されていれば id:3 の応答は出ない）
+// 3) 観測用の時間をおいて終了する。抑止されていれば id:3 の応答は出ない。
 setTimeout(() => {
   try { child.kill(); } catch {}
   const ok = !sawCallResponse;

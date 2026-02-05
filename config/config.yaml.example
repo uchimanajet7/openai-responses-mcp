@@ -1,10 +1,9 @@
 # config/config.yaml.example
 # 本ファイルはサンプルです。実運用ではコピーして編集し、
-# 既定パス（macOS/Linux: ~/.config/openai-responses-mcp/config.yaml,
-# Windows: %APPDATA%\openai-responses-mcp\config.yaml）に配置するか、
-# CLI の --config で明示してください。
+# 既定パスは ~/.config/openai-responses-mcp/config.yaml です。
+# そこに配置するか、CLI の --config で明示してください。
 #
-# 優先順位: CLI > ENV > YAML > TS defaults（配列は置換、オブジェクトは深いマージ）
+# 優先順位: ENV > YAML > TS defaults。配列は置換し、オブジェクトは深いマージ。
 
 openai:
   # 認証に使う環境変数名。通常は OPENAI_API_KEY を使用し、YAML に鍵は書かない。
@@ -15,13 +14,13 @@ openai:
 request:
   # タイムアウト（ミリ秒）
   timeout_ms: 300000
-  # 自動リトライ回数（429/5xx/AbortError）
+  # 自動リトライ回数（429/5xx）
   max_retries: 3
 
 # マルチプロファイル設定
 # 用途に応じて3つのツールプロファイルを提供
 model_profiles:
-  # 必須・基準プロファイル（未設定時は起動エラー）
+  # 必須・基準プロファイル。未定義の場合は起動後のtools/callでエラーとなる
   answer:
     model: gpt-5.2
     reasoning_effort: medium
@@ -48,12 +47,8 @@ model_profiles:
 # # answer_detailed, answer_quick は省略 → answer の設定で動作
 
 policy:
-  # 迷ったら検索を優先するか（時事性取りこぼし防止）
-  prefer_search_when_unsure: true
   # 出典の最大件数（1〜10 程度を推奨）
   max_citations: 3
-  # 出典に ISO 日付（YYYY-MM-DD）併記を要求
-  require_dates_iso: true
   # System Policy の外部ファイルを使う場合は以下を有効化
   # system:
   #   source: file
@@ -70,14 +65,12 @@ search:
     domains: []
 
 server:
-  # トランスポート種別。現状は stdio のみ実装。
-  transport: stdio
   # デバッグ（詳細ログ）: CLI/ENV/YAML は同義（優先度: CLI > ENV > YAML）
   # - CLI: --debug / --debug <path>
   # - ENV: DEBUG=1|true|<path>
   # - YAML: server.debug: true（任意で server.debug_file: <path>）
   debug: false
-  # パス指定時は stderr をファイルへTEEミラー
+  # debug が true のとき、パス指定で stderr をファイルへ同時出力
   debug_file: null
   # 起動時にstderrへ実効設定の要約を表示
   show_config_on_start: false

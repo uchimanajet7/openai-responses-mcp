@@ -1,6 +1,6 @@
 {
   "name": "openai-responses-mcp",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Lightweight MCP server (Responses API core). OpenAI integration + web_search.",
   "type": "module",
   "bin": {
@@ -32,11 +32,11 @@
     "test:cancel-during-call": "node scripts/test-cancel-during-call.js"
   },
   "dependencies": {
-    "openai": "^6.15.0",
+    "openai": "^6.17.0",
     "yaml": "^2.8.2"
   },
   "devDependencies": {
-    "@types/node": "^25.0.3",
+    "@types/node": "^25.2.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },

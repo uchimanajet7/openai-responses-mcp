@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import readline from "node:readline";
 
-const NPM = process.platform === "win32" ? "npm.cmd" : "npm";
+const NPM = "npm";
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const packageJsonPath = resolve(repoRoot, "package.json");
 

@@ -48,7 +48,7 @@ export function readMessages(onMessage: (msg: JsonRpcMessage) => void): void {
     }
     buffer = Buffer.concat([buffer, chunkBuf]);
     while (true) {
-      // ヘッダ終端を検出（CRLFCRLF 優先、無ければ LFLF も許容）
+      // ヘッダ終端を検出する。CRLFCRLF を優先し、無ければ LFLF を許容する。
       let headerEnd = buffer.indexOf("\r\n\r\n");
       let sepLen = 4;
       if (headerEnd === -1) {
@@ -67,7 +67,7 @@ export function readMessages(onMessage: (msg: JsonRpcMessage) => void): void {
             console.error(`[mcp] fallback parse line bytes=${Buffer.byteLength(line, "utf8")}`);
           }
           buffer = buffer.slice(lf + 1);
-          // 以後の応答は行区切りで返す（互換性のため）
+          // 以後の応答は行区切りで返す。互換性のため。
           enableLineDelimitedMode();
           onMessage(msg);
           continue; // 次のメッセージへ

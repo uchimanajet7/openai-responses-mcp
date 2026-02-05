@@ -25,7 +25,7 @@ export type CallArgs = {
   input: any;
   tools?: any[];
   include?: ResponseIncludable[] | null;
-  // Responses API（モデル対応時のみ付与される想定）
+  // Responses API。モデル対応時のみ付与される想定。
   text?: any;
   reasoning?: any;
 };
@@ -40,7 +40,7 @@ export async function callResponsesWithRetry(
   const maxRetries = cfg.request.max_retries;
   let lastError: any;
 
-  // model_profiles構造に基づくリトライ（フォールバック機能削除）
+  // model_profiles構造に基づくリトライ。フォールバック機能は削除済み。
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       // 事前にキャンセル済みなら即中断
@@ -76,7 +76,7 @@ export async function callResponsesWithRetry(
         } catch {}
       }
       const aborted = externalSignal?.aborted || e?.name === "AbortError" || e?.name === "APIUserAbortError";
-      // キャンセル時は即中断（リトライしない）
+      // キャンセル時は即中断。リトライしない。
       if (aborted) break;
       const retriable = (e?.status && (e.status === 429 || e.status >= 500));
       if (!retriable || attempt === maxRetries) break;

@@ -1,80 +1,81 @@
 
 # 再現性・再構築ガイド — `docs/reference/reproducibility.md`
-最終更新: 2025-08-15（Asia/Tokyo, AI確認）
+最終更新: 2026-01-14 Asia/Tokyo
 
 この文書は **openai-responses-mcp** の結果・挙動を**できる限り再現**するための運用規約と具体手順を定義します。  
 「npm 固定」「安定版のみ」「要約禁止」の方針に準拠します。
 
 ---
 
-## 1. 前提と限界（LLM＋検索の非決定性）
+## 1. LLM＋検索の非決定性に関する前提と限界
 再現性を阻害しうる要因を先に明示します。完全決定性は**保証しません**。
 
-- **LLM 非決定性**：温度設定固定でも同一応答が出ない可能性がある（OpenAI 側仕様）。
+- **LLM 非決定性**：OpenAI 側仕様のため、温度設定固定でも同一応答が出ない可能性がある。
 - **web_search の可変性**：インデックス更新、ランク変動、記事の改稿・削除。
-- **時制依存**：相対日付は JST（Asia/Tokyo）で絶対化するが、**「本日」**は日が変わると結果も変わる。
+- **時制依存**：相対日付は JST で絶対化するが、**「本日」**は日が変わると結果も変わる。
 - **API バージョン**：OpenAI SDK/Responses API のマイナー変更で注釈フォーマットが変わる可能性。
 
 → 本リポジトリは以下の**緩和策**で「十分に同等な再現」を狙います。
 
 ---
 
-## 2. バージョン固定（強制）
-- **Node**: 同一メジャーを全員で使用（推奨: v24 系）。
-  - `package.json` の `engines.node` を利用（例: `">=20 <25"`）。
-  - 任意（推奨）：`.nvmrc` / `volta` / `asdf` 等で OS ローカル固定（*npm 固定の方針に反しない*）。
-- **npm**: Node 同梱を使用。依存導入は **`npm ci`** を優先（`package-lock.json` 前提）。
-- **依存**: `package.json` は **厳密バージョン**（`^`/`~`を避ける）。
-  - 変更が必要なときは**必ず** `changelog.md` を更新し、`package-lock.json` と同時コミット。
+## 2. 強制するバージョン固定
+- **Node**: 同一メジャーを全員で使用。推奨は v24 系。
+- `package.json` の `engines.node` を利用する。例: `">=20"`。
+  - 任意: 推奨は `.nvmrc` / `volta` / `asdf` 等で OS ローカル固定。*npm 固定の方針に反しない*。
+- **npm**: Node 同梱を使用。依存導入は `package-lock.json` 前提で **`npm ci`** を優先する。
+- **依存**: `package-lock.json` を基準にする。依存導入は **`npm ci`** を優先する。
+  - 依存を更新したときは **`docs/changelog.md`** と `package-lock.json` を同時更新。
 
-> 代表設定（例）: `package.json`
+> 代表設定の例: `package.json`
 ```json
 {
-  "engines": { "node": ">=20 <25" },
-  "overrides": {},
-  "packageManager": "npm@11"
+  "engines": { "node": ">=20" }
 }
 ```
 
 ---
 
-## 3. 設定スナップショット（事実の固定）
+## 3. 事実を固定する設定スナップショット
 **実効設定**を JSON で保存しておくと、後から「どの設定で動かしたか」を再現できます。
 
 ```bash
-# 実効設定を保存（sources = 反映元、effective = 実際に使われた値）
-npx openai-responses-mcp --show-config 2> .snapshots/effective-config.json
+# 実効設定を保存。sources は反映元、effective は実際に使われた値。
+node -e "require('fs').mkdirSync('.snapshots',{recursive:true})"
+node build/index.js --show-config 2> .snapshots/effective-config.json
 ```
 
 - `--config` を指定した場合はパスも `sources.yaml` に残る。
-- ENV/CLI を使った場合、`sources.env`/`sources.cli` に**キー名**が記録される。
+- 環境変数の値が実際に反映された場合のみ、`sources.env` に当該の環境変数名が記録される。コマンドライン引数由来は記録しない。
 
 > 参考: スキーマと主要キーは `docs/reference/config-reference.md` を参照。
 
 ---
 
 ## 4. タイムゾーン・日付の固定
-- すべての相対日付は **Asia/Tokyo** で絶対化（サーバ実装規約）。
+- すべての相対日付は **Asia/Tokyo** で絶対化する。サーバ実装規約。
 - テスト時は OS の `TZ` を明示して起動すると観測系の差異を避けやすい：
 ```bash
-TZ=Asia/Tokyo npx openai-responses-mcp --show-config 2> /tmp/effective.json; head -n 5 /tmp/effective.json
+TZ=Asia/Tokyo node build/index.js --show-config 2> ./effective.json; head -n 5 ./effective.json
 ```
 
 ---
 
-## 5. 安定・時事テストの分離（スイート構成）
+## 5. スイート構成としての安定・時事テスト分離
 テストケースを 2 系列に分けます。
 
-### 5.1 MCP レイヤ（API鍵不要・決定性重視）
+### 5.1 API鍵不要の決定性重視 MCP レイヤ
 - 期待: `initialize` と `tools/list` の応答形が安定
 ```bash
+node -e "require('fs').mkdirSync('.snapshots',{recursive:true})"
 npm run mcp:smoke:ldjson | tee .snapshots/mcp-ldjson.out
 ```
 
-### 5.2 API 呼び出しを含むケース（要 OPENAI_API_KEY）
-- 期待: `initialize`/`tools/list`/`tools/call(answer)` の3応答が取得できる（本文は非決定）
+### 5.2 OPENAI_API_KEY が必要な API 呼び出しを含むケース
+- 期待: `initialize`/`tools/list`/`tools/call(answer)` の3応答が取得できる。本文は未確定。
 ```bash
 export OPENAI_API_KEY="sk-..."
+node -e "require('fs').mkdirSync('.snapshots',{recursive:true})"
 npm run mcp:smoke | tee .snapshots/mcp-content-length.out
 ```
 
@@ -82,9 +83,9 @@ npm run mcp:smoke | tee .snapshots/mcp-content-length.out
 
 ---
 
-## 6. 比較・回帰チェック（例）
+## 6. 比較・回帰チェックの例
 ```bash
-# LDJSON の行数や JSON 形を比較（本文の完全一致は求めない）
+# LDJSON の行数や JSON 形を比較する。本文の完全一致は求めない。
 wc -l .snapshots/mcp-ldjson.out
 grep -c '"jsonrpc":"2.0"' .snapshots/mcp-ldjson.out
 ```
@@ -93,7 +94,7 @@ grep -c '"jsonrpc":"2.0"' .snapshots/mcp-ldjson.out
 
 ## 7. ネットワークとプロキシの固定
 - 企業ネットワーク経由時は `HTTPS_PROXY`/`HTTP_PROXY`/`NO_PROXY` を**必ず**記録。  
-- 取得失敗（429/5xx/Abort）が続く再現がある場合は、**レイテンシや再試行回数**もログへ。
+- 取得失敗（429/5xx）が続く再現がある場合は、**レイテンシや再試行回数**もログへ。
 
 ---
 
@@ -120,7 +121,7 @@ grep -c '"jsonrpc":"2.0"' .snapshots/mcp-ldjson.out
 1. ブランチで変更（依存・設定・ポリシー）。
 2. `npm ci && npm run build` で再現性を確認。
 3. **全スイート**（安定/時事）を実行し、`.snapshots` を更新。
-4. `docs/changelog.md` と `docs/status.md` を更新。
+4. `docs/changelog.md` を更新。
 5. PR でレビュー（特に **System Policy** の改変は慎重に）。
 
 ---
@@ -133,8 +134,11 @@ grep -c '"jsonrpc":"2.0"' .snapshots/mcp-ldjson.out
 ---
 
 ## 12. 最低限の「再現できた」証拠の残し方
-- `npx openai-responses-mcp --show-config 2> .snapshots/effective-config.json`
+```bash
+node -e "require('fs').mkdirSync('.snapshots',{recursive:true})"
+```
+- `node build/index.js --show-config 2> .snapshots/effective-config.json`
 - `npm run mcp:smoke:ldjson > .snapshots/mcp-ldjson.out`
-- （任意）`npm run mcp:smoke > .snapshots/mcp-content-length.out`（要 `OPENAI_API_KEY`）
+- 任意: `npm run mcp:smoke > .snapshots/mcp-content-length.out`。`OPENAI_API_KEY` が必要です。
 
 以上 3 点が揃っていれば、**誰でも**同じ配置・同じバージョンで**同等結果**を再現できます。

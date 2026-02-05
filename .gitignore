@@ -8,29 +8,13 @@ dist/
 
 # local env & secrets
 .env
-config/config.yaml
-
-# logs & temp
-*.log
-_debug.log
-_temp_/
 
 # OS/editor
 .DS_Store
-Thumbs.db
 .vscode/
-.idea/
-.claude/
 
 # tool caches
 .cache/
 .nyc_output/
 coverage/
 .pnpm-store/
-
-# local only
-docs/_drafts_/
-docs/_local_/
-_AI-VIOLATIONS_.md
-CLAUDE.md
-AGENTS.md

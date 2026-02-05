@@ -1,6 +1,6 @@
 // マルチプロファイル対応のツール定義
 export const AVAILABLE_PROFILES = [
-  "answer",           // 基準プロファイル（必須）
+  "answer",           // 基準プロファイル。必須。
   "answer_detailed",  // 詳細分析プロファイル
   "answer_quick"      // 高速プロファイル
 ] as const;
@@ -15,8 +15,7 @@ export const TOOL_DEFINITIONS = {
         query: { type: "string" },
         recency_days: { type: "number" },
         max_results: { type: "number" },
-        domains: { type: "array", items: { type: "string" } },
-        style: { enum: ["summary","bullets","citations-only"] }
+        domains: { type: "array", items: { type: "string" } }
       },
       required: ["query"]
     }
@@ -31,8 +30,7 @@ export const TOOL_DEFINITIONS = {
         query: { type: "string" },
         recency_days: { type: "number" },
         max_results: { type: "number" },
-        domains: { type: "array", items: { type: "string" } },
-        style: { enum: ["summary","bullets","citations-only"] }
+        domains: { type: "array", items: { type: "string" } }
       },
       required: ["query"]
     }

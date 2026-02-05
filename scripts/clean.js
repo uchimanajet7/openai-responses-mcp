@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 簡易クリーン: build/ を削除（クロスプラットフォーム対応のためNodeで実装）
+// 簡易クリーン: build/ を削除する。Nodeで実装し、OS差を避ける。
 import { rmSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -16,4 +16,3 @@ try {
   console.error(`[clean] failed: ${e?.message ?? e}`);
   process.exit(1);
 }
-

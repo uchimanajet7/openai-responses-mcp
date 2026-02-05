@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { fileURLToPath } from "node:url";
-import { dirname, join, resolve } from "node:path";
-import { readFileSync, createWriteStream, mkdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { readFileSync } from "node:fs";
 import { loadConfig } from "./config/load.js";
 import { resolveConfigPath } from "./config/paths.js";
 import { startServer } from "./mcp/server.js";
@@ -36,7 +36,7 @@ function parseArgs(argv: string[]): Opts {
     else if (a === "--config") { o.configPath = argv[++i]; }
     else if (a.startsWith("--config=")) { o.configPath = a.split("=",2)[1]; }
     else if (a === "--debug") {
-      // --debug に続くトークンがパス（先頭が'-'以外）なら取り込む
+      // --debug に続くトークンがパスなら取り込む。先頭が'-'以外の場合。
       const next = argv[i+1];
       if (next && !next.startsWith("-")) { o.debug = true; o.debugPath = next; i++; }
       else { o.debug = true; }
@@ -50,7 +50,7 @@ function parseArgs(argv: string[]): Opts {
 }
 
 function usage(): void {
-  console.log(`openai-responses-mcp (Step4)
+  console.log(`openai-responses-mcp
 Usage:
   openai-responses-mcp --help
   openai-responses-mcp --version
@@ -58,8 +58,8 @@ Usage:
   openai-responses-mcp --stdio   # Start MCP stdio server
 
 Notes:
-  - Priority: CLI > ENV > YAML > TS defaults
-  - Default YAML path: ~/.config/openai-responses-mcp/config.yaml (or %APPDATA%\\openai-responses-mcp\\config.yaml on Windows)
+  - Priority: ENV > YAML > TS defaults
+  - Default YAML path: ~/.config/openai-responses-mcp/config.yaml
 `);
 }
 
@@ -82,7 +82,7 @@ async function main() {
 
   // --show-config の扱い：
   // - 単独指定時: stderr にJSON出力し、0終了
-  // - --stdio と併用時: stderr にJSON出力し、そのままサーバ継続（stdoutは汚さない）
+  // - --stdio と併用時: stderr にJSON出力し、そのままサーバ継続。stdout は汚さない。
   let showConfigPrinted = false;
   if (args.showConfig) {
     try {
@@ -102,36 +102,36 @@ async function main() {
     }
   }
   if (args.stdio) {
-    // デバッグ有効化（優先度: CLI > ENV > YAML）
+    // デバッグ有効化。優先度は CLI > ENV > YAML。
     const yamlDbg = (loaded.effective.server as any)?.debug ? true : false;
     const yamlDbgFile = (loaded.effective.server as any)?.debug_file || null;
 
-    // 1) CLI を最優先で反映（仕様：CLI/ENV/YAML 同義）
+    // 1) CLI を最優先で反映。仕様は CLI/ENV/YAML 同義。
     if (args.debug) {
       loaded.effective.server.debug = true;
       if (args.debugPath) loaded.effective.server.debug_file = args.debugPath;
-      // ENV も同期（transport層のデバッグ判定で利用するため）
+      // ENV も同期する。transport層のデバッグ判定で利用するため。
       process.env.DEBUG = args.debugPath ? args.debugPath : '1';
     }
 
-    // 2) ENV（DEBUG）が存在し、CLIで未指定なら反映
+    // 2) ENV の DEBUG が存在し、CLIで未指定なら反映
     if (!args.debug && process.env.DEBUG && process.env.DEBUG.length > 0) {
       const v = String(process.env.DEBUG);
       loaded.effective.server.debug = true;
       if (v !== '1' && v.toLowerCase() !== 'true') loaded.effective.server.debug_file = v;
     }
 
-    // 3) YAML（最後に不足分補完）
+    // 3) YAML。最後に不足分を補完する。
     if (!loaded.effective.server.debug && yamlDbg) loaded.effective.server.debug = true;
     if (!loaded.effective.server.debug_file && yamlDbgFile) loaded.effective.server.debug_file = yamlDbgFile;
 
     const dbgEnabled = !!loaded.effective.server.debug;
     const dbgFile = (loaded.effective.server as any).debug_file || null;
 
-    // 単一判定へ反映（以降は isDebug() を参照）
+    // 単一判定へ反映する。以降は isDebug() を参照する。
     setDebug(dbgEnabled, dbgFile);
 
-    // デバッグ時は起動情報をstderrに出す（GUIクライアントでの切り分け用）
+    // デバッグ時は起動情報を stderr に出す。GUIクライアントの切り分け用。
     if (dbgEnabled) {
       logInfo(`starting stdio server pid=${process.pid}`);
       logInfo(`argv=${JSON.stringify(process.argv)}`);

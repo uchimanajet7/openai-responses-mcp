@@ -39,7 +39,7 @@ function fromYaml(path?: string): PartialDeep<Config> {
 function applyEnv(cfg: Config, env: NodeJS.ProcessEnv): Config {
   const copy = JSON.parse(JSON.stringify(cfg)) as Config;
 
-  // モデル（answer）クイック上書き
+  // モデル answer のクイック上書き
   if (env.MODEL_ANSWER) {
     if (!copy.model_profiles.answer) copy.model_profiles.answer = { model: '', reasoning_effort: 'medium', verbosity: 'medium' } as any;
     copy.model_profiles.answer.model = String(env.MODEL_ANSWER);
@@ -121,9 +121,9 @@ export function loadConfig(opts: LoadOptions): Loaded {
     for (const k of keys) if (opts.env[k] !== undefined) envTouched.push(k);
   }
 
-  // CLIからのモデル上書きはサポートしない（YAMLに統一）
+  // CLIからのモデル上書きはサポートしない。YAMLに統一する。
 
-  // 設定値のバリデーション（フェイルファスト）
+  // 設定値のバリデーション。フェイルファスト。
   validateConfig(current);
 
   return {
@@ -138,6 +138,18 @@ export function loadConfig(opts: LoadOptions): Loaded {
 }
 
 function validateConfig(cfg: Config): void {
+  const policy = (cfg as any)?.policy;
+  if (policy && Object.prototype.hasOwnProperty.call(policy, "prefer_search_when_unsure")) {
+    throw new Error("Config key policy.prefer_search_when_unsure was removed; delete it from YAML.");
+  }
+  if (policy && Object.prototype.hasOwnProperty.call(policy, "require_dates_iso")) {
+    throw new Error("Config key policy.require_dates_iso was removed; delete it from YAML.");
+  }
+  const server = (cfg as any)?.server;
+  if (server && Object.prototype.hasOwnProperty.call(server, "transport")) {
+    throw new Error("Config key server.transport was removed; delete it from YAML.");
+  }
+
   const allowedEffort = new Set(["low", "medium", "high", "xhigh"]);
   const profiles = cfg.model_profiles as any;
   for (const name of Object.keys(profiles)) {

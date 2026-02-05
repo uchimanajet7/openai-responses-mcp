@@ -1,6 +1,6 @@
 
 # 環境セットアップ（ローカル開発・再現性）— `docs/reference/environment-setup.md`
-最終更新: 2025-12-19（Asia/Tokyo, AI確認）
+最終更新: 2026-01-14 Asia/Tokyo
 
 本ドキュメントは **openai-responses-mcp** をローカルで安定稼働させるための環境準備を、OS 別に具体化した手順です。  
 **npm 固定**。beta/alpha ツールは使いません。
@@ -8,7 +8,7 @@
 ---
 
 ## 1. 要件
-- OS: macOS / Linux / Windows
+- OS: macOS / Linux
 - Node.js: **v20 以上（推奨: v24 系）**
 - npm: Node 同梱の安定版
 - ネットワーク: `api.openai.com` への HTTPS アクセス
@@ -34,9 +34,6 @@ npm -v
 - ディストリに付属の安定版（apt/dnf 等）または公式バイナリ。  
 - ビルドが必要な場合に備えて `build-essential` 相当を導入。
 
-### 2.3 Windows
-- 公式インストーラ（.msi）。PowerShell を「管理者として実行」で起動して確認。
-
 > いずれの OS でも `node -v` がエラー無く表示されれば OK。
 
 ---
@@ -50,28 +47,17 @@ npm -v
 export OPENAI_API_KEY="sk-..."
 ```
 
-**PowerShell (Windows)**
-```powershell
-$env:OPENAI_API_KEY="sk-..."
-```
-
 ### 3.2 永続化（次回以降も有効）
 **zsh**
 ```bash
-echo 'export OPENAI_API_KEY="sk-..."' >> ~/.zshrc
+test -f ~/.zshrc && grep -qxF 'export OPENAI_API_KEY="sk-..."' ~/.zshrc || echo 'export OPENAI_API_KEY="sk-..."' >> ~/.zshrc
 source ~/.zshrc
 ```
 
 **bash**
 ```bash
-echo 'export OPENAI_API_KEY="sk-..."' >> ~/.bashrc
+test -f ~/.bashrc && grep -qxF 'export OPENAI_API_KEY="sk-..."' ~/.bashrc || echo 'export OPENAI_API_KEY="sk-..."' >> ~/.bashrc
 source ~/.bashrc
-```
-
-**PowerShell**
-```powershell
-[System.Environment]::SetEnvironmentVariable("OPENAI_API_KEY","sk-...","User")
-# 新しい PowerShell を開いて反映を確認
 ```
 
 > ENV 名はデフォルトで `OPENAI_API_KEY`。`docs/reference/config-reference.md` の `openai.api_key_env` を変えた場合は、その名称で設定。
@@ -85,13 +71,6 @@ source ~/.bashrc
 export HTTPS_PROXY="http://proxy.example.com:8080"
 export HTTP_PROXY="$HTTPS_PROXY"
 export NO_PROXY="localhost,127.0.0.1"
-```
-
-Windows PowerShell:
-```powershell
-$env:HTTPS_PROXY="http://proxy.example.com:8080"
-$env:HTTP_PROXY=$env:HTTPS_PROXY
-$env:NO_PROXY="localhost,127.0.0.1"
 ```
 
 > 社内 CA を利用する環境では、OS/Node の信頼ストアに証明書を正しく登録してください。
@@ -114,11 +93,10 @@ node build/index.js --show-config 2> effective-config.json
 
 ---
 
-## 6. 設定（任意）
-YAML は任意。無くても動きます。置く場合の既定パス：
+## 6. 設定
+YAML は任意です。無くても動作します。置く場合の既定パス：
 
-- macOS/Linux: `~/.config/openai-responses-mcp/config.yaml`  
-- Windows: `%APPDATA%\openai-responses-mcp\config.yaml`
+- 既定パス: `~/.config/openai-responses-mcp/config.yaml`  
 
 最小例：
 ```yaml
@@ -129,20 +107,20 @@ model_profiles:
     verbosity: medium
 ```
 
-**優先順位**: CLI > ENV > YAML > TS（配列は置換・オブジェクトは深いマージ）。
+**優先順位**: ENV > YAML > TS defaults。配列は置換し、オブジェクトは深いマージ。
 
 ---
 
 ## 7. 検証（MCP レイヤ）
 ```bash
 # LDJSON スモーク（OpenAI API鍵不要）
-npm run mcp:smoke:ldjson | tee /tmp/mcp-smoke-ldjson.out
-grep -c '"jsonrpc":"2.0"' /tmp/mcp-smoke-ldjson.out
+npm run mcp:smoke:ldjson | tee ./mcp-smoke-ldjson.out
+grep -c '"jsonrpc":"2.0"' ./mcp-smoke-ldjson.out
 
 # Content-Length スモーク（要 OPENAI_API_KEY）
 export OPENAI_API_KEY="sk-..."
-npm run mcp:smoke | tee /tmp/mcp-smoke.out
-grep -c '^Content-Length:' /tmp/mcp-smoke.out
+npm run mcp:smoke | tee ./mcp-smoke.out
+grep -c '^Content-Length:' ./mcp-smoke.out
 ```
 
 ---
@@ -161,4 +139,4 @@ grep -c '^Content-Length:' /tmp/mcp-smoke.out
 ## 9. 再現性のための推奨
 - Node メジャーを固定（例: 全員 v24 系で統一）。
 - `--show-config` のstderr出力を保存し、差分監視（CI）で逸脱を検知。
-- 秘密は ENV のみ。ログ/設定ファイルへ**絶対に**残さない。
+- 秘密は ENV のみ。ログは通常は最小限。デバッグ有効時は送受信 JSON が出力されるため回答本文が含まれる。

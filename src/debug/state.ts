@@ -1,5 +1,5 @@
 // デバッグ状態の単一判定を提供するモジュール
-// - 起動時に setDebug() で最終状態（enabled/file）を確定
+// - 起動時に setDebug() で最終状態を確定する。enabled/file。
 // - 以降は isDebug()/getDebugFile() を参照
 
 import { createWriteStream, mkdirSync } from "node:fs";
@@ -44,4 +44,3 @@ function installFileSink(path: string): void {
     // ファイルシンクに失敗しても画面出力のみ継続
   }
 }
-

@@ -1,29 +1,20 @@
 
 # ドキュメント入口（Index）— `docs/README.md`
-最終更新: 2025-08-15（Asia/Tokyo, AI確認）
+最終更新: 2026-01-14 Asia/Tokyo
 
 このフォルダは **openai-responses-mcp** の公式ドキュメント一式です。  
-**仕様は `spec.md` が正準（canonical）**であり、他は参照・運用・検証のための付属文書です。
+**仕様・挙動は実装が正**です。まず `spec.md` を読んでください。ほかは参照・運用・検証のための補助資料です。
 
 ---
 
 ## 1. クイックスタート
-```bash
-# 依存＆ビルド（再現性重視）
-npm ci
-npm run build
+- 1) 依存導入: `npm ci`
+- 2) ビルド: `npm run build`
+- 3) 実効設定の保存: `node build/index.js --show-config 2> effective-config.json`
+- 4) 最小起動: `node build/index.js --stdio`
+- 5) スモーク: `npm run mcp:smoke:ldjson`
 
-# 実効設定の確認（stderrにJSON出力）
-npx openai-responses-mcp --show-config 2> effective-config.json
-
-# 最小起動（MCP stdio）
-npx openai-responses-mcp --stdio
-
-# スモーク（疎通）
-npm run mcp:smoke:ldjson
-```
-
-> API キーは **環境変数**で渡す（OpenAI APIを実行する一部のスモーク・実行で必要）: `export OPENAI_API_KEY="sk-..."`（PowerShell は `$env:OPENAI_API_KEY="sk-..."`）。
+> API キーは **環境変数**で渡します。OpenAI API を呼び出すスモークや実行で必要です。例: `export OPENAI_API_KEY="sk-..."`。
 
 ---
 
@@ -39,8 +30,8 @@ npm run mcp:smoke:ldjson
 ---
 
 ## 4. リファレンス（仕様の詳細）
-- **[reference/config-reference.md](./reference/config-reference.md)** — 設定スキーマと優先順位（CLI > ENV > YAML > TS）
-- **[reference/system-policy.md](./reference/system-policy.md)** — System Policy の参照先（SSOTはコード: `src/policy/system-policy.ts`）
+- **[reference/config-reference.md](./reference/config-reference.md)** — 設定スキーマと優先順位: ENV > YAML > TS defaults
+- **[reference/system-policy.md](./reference/system-policy.md)** — System Policy の参照先: `src/policy/system-policy.ts`
 - **[reference/transports.md](./reference/transports.md)** — トランスポート仕様（stdio 実装済み / HTTP 設計）
 - **[reference/client-setup-claude.md](./reference/client-setup-claude.md)** — Claude Code/Desktop への登録手順（stdio）
 - **[reference/installation.md](./reference/installation.md)** — インストールとローカル検証（npm 固定）
@@ -68,15 +59,15 @@ openai-responses-mcp/
 ---
 
 ## 6. 設定優先順位（再掲・短縮版）
-- **CLI > ENV > YAML > TS defaults**（後勝ち）  
+- 設定値の優先順位: **ENV > YAML > TS defaults**。YAML は `--config <path>` で読み込むファイルを指定する。  
 - 配列は**置換**、オブジェクトは**深いマージ**。  
 - 実効値は `--show-config` で JSON 出力（stderr）。
 
 ---
 
 ## 7. DoD（現在の要件）
-- HTTP 404 → `used_search=false`, `citations=[]`
-- 本日 YYYY-MM-DD の東京の天気 → `used_search=true`、本文に **情報源 + ISO 日付**（URL または情報源ID）、`citations>=1`
+- HTTP 404 → `answer`（本文）が返り、`used_search=false`, `citations=[]`
+- 本日 YYYY-MM-DD の東京の天気 → `answer`（本文）に **情報源 + ISO 日付**（URL または情報源ID）、`used_search=true`、`citations>=1`
 
 
 ---
@@ -90,4 +81,4 @@ openai-responses-mcp/
 
 ## 9. 連絡とライセンス
 - ライセンス: MIT（`package.json` に準拠）
-- 連絡: Pull Request / Issue でお願いします。
+- 連絡: GitHub の Pull Request / Issue でお願いします。

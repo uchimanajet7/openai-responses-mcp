@@ -1,6 +1,5 @@
 import type { Config } from "../config/defaults.js";
 import { createClient, callResponsesWithRetry } from "../openai/client.js";
-import { SYSTEM_POLICY } from "../policy/system-policy.js";
 import { isDebug } from "../debug/state.js";
 import { resolveSystemPolicy } from "../policy/resolve.js";
 
@@ -9,19 +8,12 @@ export type AnswerInput = {
   recency_days?: number;
   max_results?: number;
   domains?: string[];
-  style?: "summary" | "bullets" | "citations-only";
 };
 
 type Citation = { url: string; title?: string; published_at?: string | null };
-type AnswerOut = {
-  answer: string;
-  used_search: boolean;
-  citations: Citation[];
-  model: string;
-};
 
 function isoDateJst(now: Date = new Date()): string {
-  // JST は固定オフセット（+09:00、サマータイムなし）
+  // JST は固定オフセット +09:00。サマータイムは無い。
   const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
   return jst.toISOString().slice(0, 10);
 }
@@ -34,12 +26,12 @@ function toIsoDateMaybe(value: unknown): string | null {
 
 function pickUrlCitationFields(annotation: any): { url?: string; title?: string } {
   if (!annotation) return {};
-  // Responses API の例（フラット）
+  // Responses API の例。フラット形式。
   if (typeof annotation.url === "string") {
     const title = typeof annotation.title === "string" ? annotation.title : undefined;
     return { url: annotation.url, title };
   }
-  // Chat 互換（ネスト）: { type:"url_citation", url_citation:{ url, title, ... } }
+  // Chat 互換のネスト形式。{ type:"url_citation", url_citation:{ url, title, ... } }
   const nested = annotation.url_citation;
   if (nested && typeof nested.url === "string") {
     const title = typeof nested.title === "string" ? nested.title : undefined;
@@ -125,7 +117,7 @@ function extractWebSearchSources(webSearchCall: any): Citation[] {
       out.push({ url, title, published_at: publishedAt });
       continue;
     }
-    // URL が無い sources 要素（例: {type:"api", name:"oai-weather"}）は、情報源IDとして採用する
+    // URL が無い sources 要素は情報源IDとして採用する。例: {type:"api", name:"oai-weather"}
     const name = typeof (s as any).name === "string" ? (s as any).name : undefined;
     if (!name) continue;
     const kind = typeof (s as any).type === "string" ? (s as any).type : undefined;
@@ -156,7 +148,8 @@ function formatSources(citations: Citation[]): string {
 function toHints(inp: AnswerInput, cfg: Config): string {
   const r = inp.recency_days ?? cfg.search.defaults.recency_days;
   const m = inp.max_results ?? cfg.search.defaults.max_results;
-  const d = inp.domains && inp.domains.length ? ` domains: ${inp.domains.join(", ")}` : "";
+  const domains = inp.domains ?? cfg.search.defaults.domains;
+  const d = domains.length ? ` domains: ${domains.join(", ")}` : "";
   return `\n[Hints] recency_days=${r}, max_results=${m}.${d}`;
 }
 
@@ -210,8 +203,8 @@ function extractCitations(resp: any): { citations: Citation[]; used: boolean } {
     }
   } catch {}
   // `url_citation` を優先しつつ、`web_search_call.action.sources` 由来の情報源も必要に応じて併記する。
-  // - `url_citation` が 0 件の場合: sources 由来（URL/情報源ID）を採用して `citations[]` を空にしない
-  // - `url_citation` がある場合: URL 以外の情報源ID（例: oai-weather 等）を併記して「どこから検索したか」を落とさない
+  // - `url_citation` が 0 件の場合: sources 由来の URL/情報源ID を採用して `citations[]` を空にしない
+  // - `url_citation` がある場合: URL 以外の情報源IDを併記し、「どこから検索したか」を落とさない。例: oai-weather
   if (fallbackFromSources.length) {
     const includeAll = set.size === 0;
     for (const c of fallbackFromSources) {
@@ -225,7 +218,7 @@ function extractCitations(resp: any): { citations: Citation[]; used: boolean } {
       }
     }
   }
-  // 日付は ISO（YYYY-MM-DD）。公開日が取れない場合はアクセス日を埋める。
+  // 日付は ISO YYYY-MM-DD。公開日が取れない場合はアクセス日を埋める。
   const citations = [...set.values()].map((c) => ({
     url: c.url,
     title: c.title || undefined,
@@ -244,11 +237,11 @@ function extractCitations(resp: any): { citations: Citation[]; used: boolean } {
 // `signal` は MCP キャンセルを伝搬するために使用
 export async function callAnswer(input: AnswerInput, cfg: Config, profileName?: string, signal?: AbortSignal) {
   const client = createClient(cfg);
-  // SSOT（src/policy/system-policy.ts）を既定とし、必要に応じて外部policy.mdを合成
+  // 既定のシステムポリシーを使い、必要に応じて policy.md を合成する
   const system = resolveSystemPolicy(cfg);
   const userText = `${input.query}${toHints(input, cfg)}`;
 
-  // プロファイル設定を取得（指定がない場合はanswerproveイル使用）
+  // プロファイル設定を取得。未指定なら answer を使用。
   const effectiveProfileName = profileName || 'answer';
   const profile = cfg.model_profiles[effectiveProfileName as keyof typeof cfg.model_profiles] || cfg.model_profiles.answer;
   
@@ -267,11 +260,11 @@ export async function callAnswer(input: AnswerInput, cfg: Config, profileName?: 
     instructions: system,
     input: [{ role: "user", content: [{ type: "input_text", text: userText }]}],
     tools: [{ type: "web_search" }],
-    // web_search の参照URL一覧を取得（`url_citation` が返らない場合のフォールバック用）
+    // web_search の参照URL一覧を取得する。`url_citation` が返らない場合のフォールバック用。
     include: ["web_search_call.action.sources"]
   };
 
-  // プロファイル設定を適用（モデル対応時のみ）
+  // プロファイル設定を適用する。モデル対応時のみ。
   if (supportsVerbosity) {
     requestBody.text = { verbosity: profile.verbosity };
   }
@@ -280,7 +273,7 @@ export async function callAnswer(input: AnswerInput, cfg: Config, profileName?: 
     requestBody.reasoning = { effort };
   }
 
-  // DEBUG ログ: プロファイル・対応機能・送信要約（単一判定）
+  // DEBUG ログ。プロファイル・対応機能・送信要約を単一判定で出す。
   if (isDebug()) {
     try {
       const toolsOn = Array.isArray(requestBody.tools) && requestBody.tools.some((t: any) => t?.type === 'web_search');
@@ -303,7 +296,7 @@ export async function callAnswer(input: AnswerInput, cfg: Config, profileName?: 
     if (!hasSources) {
       answer = `${answer.trimEnd()}\n\nSources:\n${formatSources(limitedCitations)}`;
     } else if (!hasIsoDate) {
-      // 既存の Sources が日付を欠いている場合の救済（ヘッダは重複させない）
+      // 既存の Sources が日付を欠いている場合の救済。ヘッダは重複させない。
       answer = `${answer.trimEnd()}\n${formatSources(limitedCitations)}`;
     }
   }
@@ -318,15 +311,14 @@ export async function callAnswer(input: AnswerInput, cfg: Config, profileName?: 
 
 export const answerToolDef = {
   name: "answer",
-  description: "必要に応じてWeb検索を実行し、根拠（出典付き）で回答を返す",
+  description: "必要に応じてWeb検索を実行し、出典付きの根拠で回答を返す",
   inputSchema: {
     type: "object",
     properties: {
       query: { type: "string" },
       recency_days: { type: "number" },
       max_results: { type: "number" },
-      domains: { type: "array", items: { type: "string" } },
-      style: { enum: ["summary","bullets","citations-only"] }
+      domains: { type: "array", items: { type: "string" } }
     },
     required: ["query"]
   }

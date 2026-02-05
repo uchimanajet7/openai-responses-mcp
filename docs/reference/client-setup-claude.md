@@ -1,10 +1,10 @@
 
-# Claude Code / Claude Desktop 連携手順 — `docs/reference/client-setup-claude.md`
-最終更新: 2025-12-20（Asia/Tokyo, AI確認）
+# Claude Code 連携手順 — `docs/reference/client-setup-claude.md`
+最終更新: 2026-01-14 Asia/Tokyo
 
-本ドキュメントは **openai-responses-mcp**（stdio）を Claude 系クライアントに登録して利用するための、
-実務向けの完全手順です。**要約なし**。クライアント固有の設定ファイル位置はバージョンで変わるため、
-ここでは**設定フォーマットと検証手順**を厳密に記述します。
+本ドキュメントは **openai-responses-mcp**（stdio）を Claude Code（CLI）に登録して利用するための、
+実務向けの完全手順です。**要約なし**。設定ファイル `~/.claude.json` を前提に、
+**設定フォーマットと検証手順**を記述します。
 
 ---
 
@@ -14,10 +14,8 @@
 
 ---
 
-## 2. Claude クライアントでの MCP サーバ登録（共通フォーマット）
-Claude 系クライアント（Claude Code / Claude Desktop）は、共通して **`mcpServers`** という
-マップ構造でサーバを登録します。**設定ファイルの正確な場所はクライアントの UI（設定 → 開発者向け）から開く**こと。
-パスを直指定せず、**必ず UI から開いたファイル**を編集してください。
+## 2. Claude Code での MCP サーバ登録
+Claude Code（CLI）は、ユーザー設定ファイル `~/.claude.json` の **`mcpServers`** にサーバを登録します。
 
 ### 2.1 設定例（最小・推奨）
 ```json
@@ -85,25 +83,11 @@ model_profiles:
 ---
 
 ## 3. 再起動と適用
-- 設定ファイルを保存後、**Claude クライアントを完全終了 → 再起動**。
+- 設定ファイルを保存後、**Claude Code を終了 → 再起動**。
 - 起動時に MCP サーバが立ち上がり、**initialize → tools/list** が送られる。
 
----
-
-## 4. 動作確認（クライアント側での観察）
-- クライアントの **開発者ログ/デベロッパーツール**を開く（UI から辿る）。
-- 次の 3 つのメッセージが **Content-Length** 付きで現れる：
-  1) `initialize`（クライアント → サーバ）
-  2) `tools/list`（クライアント → サーバ）
-  3) `result`（サーバ → クライアント; tools 一覧に3つのツールがある）
-
-**期待値（例）**
-```http
-Content-Length: 157
-
-{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-06-18","capabilities":{"tools":{}},"serverInfo":{"name":"openai-responses-mcp","version":"0.9.0"}}}
-```
-`tools`内に`answer`、`answer_detailed`、`answer_quick`の3つが表示されれば登録成功。
+## 4. 動作確認（Claude Code 側）
+`claude mcp list` で `openai-responses` が表示され、Claude Code 内で `/mcp` から `answer` / `answer_detailed` / `answer_quick` が確認できれば登録成功。
 
 ---
 
@@ -118,15 +102,15 @@ Content-Length: 157
 ---
 
 ## 6. トラブルシュート
-- **何も表示されない**: パスが相対/誤り。**絶対パス**で指定。実行権限の不足（Windows の拡張子関連含む）。
+- **何も表示されない**: パスが相対/誤り。**絶対パス**で指定。実行権限を確認する。
 - **API キー未設定**: `Missing API key: set OPENAI_API_KEY`。設定ファイルの `env` で値を渡す。
 - **フレーミングエラー**: `Content-Length` 不一致。ビルドし直し（`npm run build`）。
-- **Timeout/429**: ネットワーク混雑または API 側都合。自動リトライ＆フォールバックが入る。
+- **Timeout/429**: ネットワーク混雑または API 側都合。自動リトライが入る。
 
 ---
 
 ## 7. セキュリティ / 運用
-- キーや回答本文の**フルログ保存はしない**。必要な最小のメタ情報のみ記録する。
+- ログは通常は最小限。デバッグ有効時は送受信 JSON が出力されるため回答本文が含まれる。
 - 機密性が高い環境では、**SSH 経由**でリモート実行し、ローカルに鍵を残さない運用も可能。
 
 ---

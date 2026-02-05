@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 行区切りJSON（Content-Lengthなし）での最小疎通スモーク
+// 行区切りJSONでの最小疎通スモーク。Content-Lengthなし。
 // initialize → tools/list を送信し、サーバの応答をそのまま標準出力に流す
 import { spawn } from "node:child_process";
 
@@ -22,10 +22,9 @@ const init = {
 };
 const list = { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} };
 
-// 行区切りJSONで送信（Content-Lengthを付けない）
+// 行区切りJSONで送信する。Content-Lengthを付けない。
 child.stdin.write(j(init) + "\n", "utf8");
 setTimeout(() => child.stdin.write(j(list) + "\n", "utf8"), 100);
 
-// 終了（短時間でkill）
+// 短時間で kill して終了する。
 setTimeout(() => { try { child.kill(); } catch {} }, 1500);
-

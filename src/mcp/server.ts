@@ -43,7 +43,7 @@ export function startServer(cfg: Config) {
   if (isDebug()) logInfo(`server.start pid=${process.pid}`);
   // 進行中リクエスト: id -> { controller, cancelled }
   const inflight = new Map<number | string, { controller: AbortController; cancelled: boolean }>();
-  // 起動時要約（stderr、MCPのstdoutを汚さない）
+  // 起動時要約。stderr に出し、MCP の stdout は汚さない。
   try {
     const srv: any = (cfg as any).server || {};
     const mp: any = (cfg as any).model_profiles?.answer || {};
@@ -65,7 +65,7 @@ export function startServer(cfg: Config) {
     if (msg.method === "initialize" && msg.id !== undefined) {
       const res = {
         protocolVersion: PROTOCOL,
-        // 本サーバは roots を未実装のため広告しない（tools のみ）
+        // 本サーバは roots を未実装のため広告しない。tools のみ。
         capabilities: { tools: {} },
         serverInfo: { name: "openai-responses-mcp", version: pkgVersion() }
       };
@@ -93,7 +93,7 @@ export function startServer(cfg: Config) {
       // プロファイル名として直接使用
       if (name && name in TOOL_DEFINITIONS) {
         try {
-          // リクエスト毎の AbortController を準備（キャンセル通知で中断）
+          // リクエスト毎の AbortController を準備する。キャンセル通知で中断する。
           const entry = { controller: new AbortController(), cancelled: false };
           inflight.set(msg.id, entry);
           const out = await callAnswer(args, cfg, name, entry.controller.signal);  // プロファイル名 + キャンセル伝搬
@@ -114,7 +114,7 @@ export function startServer(cfg: Config) {
           let etype: any = '-';
           let ename: any = '-';
           let emsg: string = e?.message || String(e);
-          // キャンセル後のエラーは握りつぶし（応答しない）
+          // キャンセル後のエラーは握りつぶす。応答しない。
           const cur = inflight.get(msg.id);
           const aborted = cur?.cancelled || cur?.controller?.signal?.aborted;
           if (aborted) {
@@ -145,7 +145,7 @@ export function startServer(cfg: Config) {
       return;
     }
 
-    // キャンセル通知（通知なので応答不要）
+    // キャンセル通知。通知なので応答不要。
     if (msg.method === "notifications/cancelled") {
       try {
         const rid = (msg?.params as any)?.requestId;
@@ -162,11 +162,11 @@ export function startServer(cfg: Config) {
       return;
     }
 
-    // ping（ヘルスチェック）最小実装
+    // ping 最小実装。ヘルスチェック用途。
     if (msg.method === "ping") {
       if (isDebug()) logInfo(`recv method=ping id=${String(msg?.id ?? '-')}`);
       if (msg.id !== undefined) {
-        // 空オブジェクトでOK（仕様上は実装依存）。
+        // 空オブジェクトでOK。仕様上は実装依存。
         sendResult(msg.id, {});
       }
       return;
