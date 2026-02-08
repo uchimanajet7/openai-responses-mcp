@@ -28,13 +28,14 @@ OpenAI Responses API を推論コアに採用した軽量な MCP サーバです
 ## 特長
 - Responses API 準拠（公式JS SDK `openai`）
 - 検索はモデルに委譲（`web_search` を常時許可）
-- 構造化出力（`answer`（本文）・`used_search`・`citations[]`・`model`）
+- 構造化出力は `answer` 本文、`used_search`、`citations[]`、`model` を返す
   - `citations[]` は **情報源**（URL または `oai-weather` 等の情報源ID）を返す
 - System Policy の参照先: `src/policy/system-policy.ts`
 - MCP stdio 実装（`initialize`/`tools/list`/`tools/call`）
 
 ## 要件
-- Node.js: 必須は v20 以上。動作確認は v24 系。
+- OS: macOS / Linux
+- Node.js: 必須は v20 以上。CI は v20 系で検証。
 - npm（Node 同梱）
 - OpenAI API キー（環境変数で渡す）
 
@@ -109,8 +110,9 @@ env = { OPENAI_API_KEY = "sk-xxxx" }
 ### 4) npx で即実行
 ```bash
 export OPENAI_API_KEY="sk-..." 
-npx openai-responses-mcp@latest --stdio --debug ./_debug.log --config ~/.config/openai-responses-mcp/config.yaml
+npx openai-responses-mcp@latest --stdio
 ```
+最小起動は `--stdio` のみ。必要に応じて `--debug <path>` / `--config <path>` / `--show-config` を付与する。
 
 ### 5) 設定（YAML は任意）
 既定パス: `~/.config/openai-responses-mcp/config.yaml`
@@ -144,7 +146,7 @@ policy:
 ### 6) ログとデバッグ
 - デバッグON: `--debug` / `DEBUG=1|true` / YAML `server.debug: true`。stderr に出力する。送受信 JSON が出力されるため回答本文が含まれる。優先度は CLI > ENV > YAML。
 - デバッグON: ファイルへも出力する。 `--debug ./_debug.log` または `DEBUG=./_debug.log`
-- デバッグOFF: 最小限の稼働確認ログのみ
+- デバッグOFF: デバッグログは出さない。エラー時のみ標準エラーに出力する。
 
 YAMLでの制御:
 - `server.debug: true|false`。YAMLだけでも全モジュールに反映する。

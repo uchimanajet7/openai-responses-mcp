@@ -2,6 +2,13 @@
 
 本プロジェクトの変更履歴です。日付は Asia/Tokyo 基準です。
 
+## [0.10.1] - 2026-02-08
+- 依存更新: `openai` を `6.17.0` から `6.18.0` に更新
+- 依存更新: `@types/node` を `25.2.0` から `25.2.2` に更新
+- 修正: `src/index.ts` の `--help` 表示を実装の受け付けオプションに一致させた
+- ドキュメント: `docs/reference/client-setup-claude.md` のトラブルシュート記述を `npx` 前提と矛盾しない内容に修正
+- ドキュメント: `README.md` / `docs/README.md` / `docs/reference/config-reference.md` / `docs/reference/environment-setup.md` / `docs/reference/installation.md` / `docs/reference/reproducibility.md` / `docs/reference/system-policy.md` / `docs/spec.md` / `docs/verification.md` を実装に合わせて更新
+
 ## [0.10.0] - 2026-02-05
 - 依存更新: `openai` を `6.16.0` から `6.17.0` に更新
 - 依存更新: `@types/node` を `25.0.10` から `25.2.0` に更新
@@ -14,7 +21,7 @@
 ## [0.9.0] - 2025-12-21
 - breaking: `citations[].url` は URL だけでなく、`oai-weather` 等の **情報源ID** を含み得る（「どこから検索したか」の証跡として採用）。
 - fix(answer): `web_search_call` があるのに `url_citation` が 0 件で `citations=[]` になるケースを、`include:["web_search_call.action.sources"]` 由来の情報源（URL/情報源ID）で補完して解消。加えて `url_citation` が存在する場合も、URL が返らない `api` ソース（例: `oai-weather`）の情報源IDは併記して「どこから検索したか」を落とさない。
-- fix(answer): `used_search=true` 時に本文へ `Sources:`（情報源 + ISO日付）を不足時にサーバ側で自動付与し、出力契約（DoD）を安定化（情報源は URL または情報源ID）。
+- fix(answer): `used_search=true` かつ `citations` が 1 件以上のとき、本文に `Sources:` が無い場合はサーバ側で自動付与し、出力契約を安定化。情報源は URL または情報源ID。
 - feat(smoke): `scripts/mcp-smoke-apikey.js` に `--tool`（`answer`/`answer_quick`/`answer_detailed`）を追加し、`npm run mcp:answer` で `answer` を簡単に呼べるようにした（`answer_quick` との比較を容易化）。
 - docs: 上記仕様（Sources=情報源、apiソース対応、Sources 自動付与）を `docs/spec.md` / `docs/reference/system-policy.md` / `docs/verification.md` / `docs/README.md` に反映。
 

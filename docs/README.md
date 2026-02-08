@@ -1,6 +1,6 @@
 
 # ドキュメント入口（Index）— `docs/README.md`
-最終更新: 2026-01-14 Asia/Tokyo
+最終更新: 2026-02-08 Asia/Tokyo
 
 このフォルダは **openai-responses-mcp** の公式ドキュメント一式です。  
 **仕様・挙動は実装が正**です。まず `spec.md` を読んでください。ほかは参照・運用・検証のための補助資料です。
@@ -32,7 +32,7 @@
 ## 4. リファレンス（仕様の詳細）
 - **[reference/config-reference.md](./reference/config-reference.md)** — 設定スキーマと優先順位: ENV > YAML > TS defaults
 - **[reference/system-policy.md](./reference/system-policy.md)** — System Policy の参照先: `src/policy/system-policy.ts`
-- **[reference/transports.md](./reference/transports.md)** — トランスポート仕様（stdio 実装済み / HTTP 設計）
+- **[reference/transports.md](./reference/transports.md)** — トランスポート仕様。標準入出力の実装のみ。
 - **[reference/client-setup-claude.md](./reference/client-setup-claude.md)** — Claude Code/Desktop への登録手順（stdio）
 - **[reference/installation.md](./reference/installation.md)** — インストールとローカル検証（npm 固定）
 - **[reference/environment-setup.md](./reference/environment-setup.md)** — OS 別の環境準備とプロキシ設定

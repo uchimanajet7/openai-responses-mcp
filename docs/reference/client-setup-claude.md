@@ -1,6 +1,6 @@
 
 # Claude Code 連携手順 — `docs/reference/client-setup-claude.md`
-最終更新: 2026-01-14 Asia/Tokyo
+最終更新: 2026-02-08 Asia/Tokyo
 
 本ドキュメントは **openai-responses-mcp**（stdio）を Claude Code（CLI）に登録して利用するための、
 実務向けの完全手順です。**要約なし**。設定ファイル `~/.claude.json` を前提に、
@@ -54,28 +54,7 @@ model_profiles:
 - **必須環境変数**: `OPENAI_API_KEY`。
 - **セキュリティ**: APIキーはENVで渡す。YAMLに秘匿情報は書かない。
 
-### 2.3 リモートで実行したい場合（SSH 経由の例）
-```json
-{
-  "mcpServers": {
-    "openai-responses-remote": {
-      "command": "ssh",
-      "args": [
-        "my-host.example.com",
-        "node", "/ABS/PATH/openai-responses-mcp/build/index.js", "--stdio"
-      ],
-      "env": {
-        "OPENAI_API_KEY": "sk-..."
-      }
-    }
-  }
-}
-```
-> SSH 経由では **接続先に Node とビルド済みファイル**が必要。鍵/接続設定は OS 側で準備する。
-
----
-
-## 2.4 環境変数（必要最小限）
+## 2.3 環境変数（必要最小限）
 | 環境変数 | 必須 | 説明 |
 |---|---|---|
 | `OPENAI_API_KEY` | ✅ | OpenAI APIキー |
@@ -102,7 +81,7 @@ model_profiles:
 ---
 
 ## 6. トラブルシュート
-- **何も表示されない**: パスが相対/誤り。**絶対パス**で指定。実行権限を確認する。
+- **何も表示されない**: `command` が `node` または実行ファイルのパスの場合は **絶対パス**を指定し、参照先と実行権限を確認する。`npx` を使う場合は `npx` がパス環境変数に含まれているかを確認する。
 - **API キー未設定**: `Missing API key: set OPENAI_API_KEY`。設定ファイルの `env` で値を渡す。
 - **フレーミングエラー**: `Content-Length` 不一致。ビルドし直し（`npm run build`）。
 - **Timeout/429**: ネットワーク混雑または API 側都合。自動リトライが入る。
@@ -111,7 +90,6 @@ model_profiles:
 
 ## 7. セキュリティ / 運用
 - ログは通常は最小限。デバッグ有効時は送受信 JSON が出力されるため回答本文が含まれる。
-- 機密性が高い環境では、**SSH 経由**でリモート実行し、ローカルに鍵を残さない運用も可能。
 
 ---
 

@@ -1,7 +1,7 @@
 
 # 正準仕様。Canonical Spec。 `docs/spec.md`
-最終更新: 2026-01-14 Asia/Tokyo  
-バージョン: **v0.9.0**
+最終更新: 2026-02-08 Asia/Tokyo  
+バージョン: **v0.10.1**
 
 本ドキュメントは **openai-responses-mcp** の仕様を説明します。  
 仕様・挙動は実装を正とします。実装と差異がある場合はドキュメント側を修正します。
@@ -225,7 +225,7 @@ model_profiles:
   "model": "used model id. Example: gpt-5.2"
 }
 ```
-- **answer（本文）側の順序規約**：answer（本文）→ 必要に応じて箇条書き → web_search を使った場合は `Sources:` で **情報源 + ISO 日付**を併記。
+- **answer（本文）側の順序規約**：answer（本文）→ 必要に応じて箇条書き → web_search を使い `citations` が 1 件以上ある場合は `Sources:` で **情報源 + ISO 日付**を併記。`citations` が空のときは `Sources:` を付与しない。
   - 情報源は URL が取れる場合は URL を用いる。URL が取れない場合は `oai-weather` 等のソース識別子を用いる。ソース識別子は `web_search_call.action.sources` の `api` ソース等。
 
 ### 3.3 検索判定
@@ -326,7 +326,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 4. **Responses 呼び出し。試行。**：
    - `model`: プロファイルの`model`値。例: `o3`, `gpt-4.1-mini`.
    - `instructions`: System Policy。4章に従い `src/policy/system-policy.ts` の `SYSTEM_POLICY` を用いる。
-- `input`: ユーザ `query` に `recency_days` と `max_results` のヒントを常に付与する。 `domains` は指定がある場合のみ追加する。
+- `input`: ユーザ `query` に `recency_days` と `max_results` のヒントを常に付与する。`domains` は入力で指定がある場合はそれを使用する。指定が無い場合は設定の `search.defaults.domains` を使用する。`search.defaults.domains` が空配列の場合は付与しない。
    - `tools`: `[{"type":"web_search"}]`。web_search は常時許可する。
    - `include`: `["web_search_call.action.sources"]`。検索で参照した **情報源一覧** を取得する。情報源は URL または情報源ID。`url_citation` が得られない場合のフォールバック、および「どこから検索したか」の補完に使用する。
    - `text`: `{"verbosity": <profile.verbosity>}`。モデルが対応する場合のみ適用する。
@@ -338,7 +338,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
    - `citations[]` は `url_citation` 由来を優先する。`url_citation` が 0 件の場合は `web_search_call.action.sources` 由来で補完する。補完内容は URL と情報源ID。`url_citation` がある場合も **URL 以外の情報源ID** は併記して「どこから検索したか」を維持する。
    - 日付は、公開日が取れない場合は **アクセス日**を Asia/Tokyo の ISO 形式 `YYYY-MM-DD` で用いる。
 7. **応答 JSON 構築**：`answer`（本文）・`used_search`・`citations[]`・`model` を含める。
-   - `used_search=true` のときは `answer` の本文末尾に `Sources:` を必ず付与し、情報源 + ISO日付を併記する。付与の担保はサーバ側の責務とし、3.2 の出力契約を満たす。
+   - `used_search=true` かつ `citations` が 1 件以上のときは `answer` の本文末尾に `Sources:` を付与し、情報源 + ISO日付を併記する。付与の担保はサーバ側の責務とし、3.2 の出力契約を満たす。`citations` が空のときは付与しない。
 8. **返送**：MCP レスポンスの `content[0].text` に **JSON 文字列**として格納。
 
 ---
@@ -457,7 +457,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 
 ### 15.1 必須項目
 - name: `openai-responses-mcp`
-- version: セマンティックバージョニング（現行 `0.9.x`）
+- version: セマンティックバージョニング（現行 `0.10.x`）
 - description: 以下の文言を使用（段階表現「Step N:」は含めない）
   - `Lightweight MCP server (Responses API core). OpenAI integration + web_search.`
 - type: `module`
@@ -478,7 +478,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ```json
 {
   "name": "openai-responses-mcp",
-  "version": "0.9.0",
+  "version": "0.10.1",
   "description": "Lightweight MCP server (Responses API core). OpenAI integration + web_search.",
   "type": "module",
   "bin": { "openai-responses-mcp": "build/index.js" },
@@ -510,7 +510,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 
 ## 付録 A. `answer` の I/O 例
 ### A.1 入力（tools/call → arguments）
-`verbosity` と `reasoning_effort` は tools/call の arguments では指定せず、`model_profiles` の設定値が適用される。
+`verbosity` と `reasoning_effort` は tools/call の arguments では指定せず、`model_profiles` の設定値が適用される。`recency_days` / `max_results` / `domains` は arguments で指定できる。
 ```json
 {
   "query": "本日 2025-08-09 の東京の天気は？",
@@ -556,11 +556,10 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 
 ### 16.2 Changelog（Keep a Changelog 準拠）
 - 位置: `docs/changelog.md`。
-- 形式: Keep a Changelog 準拠。セクション順は `Unreleased` → 過去リリース（新しい順）。
+- 形式: Keep a Changelog 準拠。セクション順は最新リリース → 過去リリース（新しい順）。
 - タイムゾーン: 日付は Asia/Tokyo。
 - 区分例: Added / Changed / Fixed / Removed / Deprecated / Security。
-- プレリリース期間（〜v1.0.0）: `Unreleased` に集約し、必要時に `vx.y.z — YYYY-MM-DD` として確定。
-- リリース確定時: `Unreleased` から該当差分を抜き出し、日付入りで新セクションを作成。
+- リリース確定時: 日付入りの新セクションを先頭に追加する。
 
 ### 16.3 Lockfile 運用（npm lockfile v3）
 - `package-lock.json` は**VCS にコミット**する（再現性のため）。

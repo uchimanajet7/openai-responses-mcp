@@ -1,6 +1,6 @@
 
 # System Policy の参照先
-最終更新: 2026-01-14 Asia/Tokyo
+最終更新: 2026-02-08 Asia/Tokyo
 
 System Policy の参照先は `src/policy/system-policy.ts`。Responses API の `instructions` には `SYSTEM_POLICY` をそのまま与える。
 
@@ -45,14 +45,14 @@ Tips:
 
 ## 5. サーバ実装が依拠する出力契約
 - 本文は `answer` に格納する。
-- `answer`（本文）→ 箇条書きで根拠と手順→ **Sources:** の順。Sources は web_search 使用時のみ。
+- `answer`（本文）→ 箇条書きで根拠と手順→ **Sources:** の順。Sources は web_search を使い `citations` が 1 件以上あるときのみ。`citations` が空のときは付与しない。
 - 検索未使用時は **Sources を出さない**。
 - `answer` の JSON の `citations[]` には `{url, title?, published_at}` を格納。
   - `url` は URL を格納する。URL が返らない場合は **情報源ID** を格納する。例: `api` ソースの `oai-weather`。
 - `published_at` は ISO 形式の日付文字列。公開日が取れない場合はアクセス日。
 - `used_search` は `answer` の JSON で、`url_citation` を 1 件以上得た、または `web_search_call` を含む場合に `true`。
 - `citations[]` は URL の `url_citation` を優先する。`include` で `web_search_call.action.sources` を取得し、**情報源** を URL または情報源ID として抽出する。`url_citation` が 0 件なら sources 由来を採用し、`url_citation` がある場合も **URL 以外の情報源ID** は併記して「検索元」を落とさない。
-- `used_search=true` のとき `answer` の本文に `Sources:` が欠けている場合は、サーバ側で `Sources:` を情報源と ISO 日付付きで自動付与して出力契約を満たす。
+- `used_search=true` かつ `citations` が 1 件以上で `answer` の本文に `Sources:` が欠けている場合は、サーバ側で `Sources:` を情報源と ISO 日付付きで自動付与して出力契約を満たす。`citations` が空のときは付与しない。
 
 ---
 

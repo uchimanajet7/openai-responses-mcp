@@ -1,6 +1,6 @@
 
 # 設定リファレンス — `docs/reference/config-reference.md`
-最終更新: 2026-01-14 Asia/Tokyo
+最終更新: 2026-02-08 Asia/Tokyo
 
 本ドキュメントは **openai-responses-mcp** の設定の参照資料です。  
 設定の**優先順位**は **ENV > YAML > TS defaults**（後勝ち、オブジェクトは深いマージ／配列は置換）。
@@ -12,7 +12,7 @@
 1. **TS defaults**（ソース内の既定値）
 2. **YAML**（`--config <path>` または既定パス）
 3. **ENV**（環境変数）
-4. **CLI**: `--config` は YAML の読込先指定。`--debug` と `--show-config` は動作切替。
+4. **CLI**: `--config` は YAML の読込先指定。`--debug` は CLI > ENV > YAML の優先度で反映。`--show-config` は出力切替。
 
 - **マージ規則**：オブジェクトは深いマージ。**配列は置換**（連結しない）。  
 - 実際に適用された最終値は `--show-config` で確認できます（`sources` にどこから反映されたかも出力）。出力先はstderrです。
@@ -228,7 +228,7 @@ YAML を読み込んだ場合、`sources.yaml` は `--config` で指定した YA
 - `search.defaults.recency_days` ≥ 0  
   
 
-現在は `model_profiles.*.reasoning_effort` など一部のみ起動時にバリデーションします。その他の値はエラーにならず、そのまま適用される場合があります。CI で `--show-config` の JSON（stderr）を検査することを推奨します。
+現在は `model_profiles.*.reasoning_effort` のみ起動時にバリデーションします。その他の値はエラーにならず、そのまま適用される場合があります。CI で `--show-config` の JSON（stderr）を検査することを推奨します。
 
 ---
 

@@ -55,7 +55,7 @@ Usage:
   openai-responses-mcp --help
   openai-responses-mcp --version
   openai-responses-mcp --show-config [--config <path>]
-  openai-responses-mcp --stdio   # Start MCP stdio server
+  openai-responses-mcp --stdio [--config <path>] [--debug [<path>]] [--show-config]   # Start MCP stdio server
 
 Notes:
   - Priority: ENV > YAML > TS defaults

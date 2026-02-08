@@ -1,6 +1,6 @@
 
 # インストール手順（ローカル / npm）— `docs/reference/installation.md`
-最終更新: 2026-01-14 Asia/Tokyo
+最終更新: 2026-02-08 Asia/Tokyo
 
 本ドキュメントは **openai-responses-mcp** をローカル環境で構築・利用するための**完全な手順**を記載します。  
 **npm 固定**（pnpm/yarn は扱いません）。MCP クライアント（Claude）側の登録は別紙 `client-setup-claude.md` を参照。
@@ -9,7 +9,7 @@
 
 ## 1. 前提条件
 - OS: macOS / Linux
-- Node.js: **v20 以上**（推奨: v24 系）
+- Node.js: **v20 以上**
 - npm: Node 同梱の安定版
 - OpenAI API キー（環境変数で渡す）
 
@@ -33,7 +33,11 @@ npx openai-responses-mcp@latest --stdio
 ---
 
 ## 3. 取得方法
-### 3.1 GitHub から ZIP をダウンロードして展開
+### 3.1 GitHub から clone して取得
+```bash
+git clone https://github.com/uchimanajet7/openai-responses-mcp.git
+cd openai-responses-mcp
+```
 ```
 openai-responses-mcp/
   ├─ src/ ...            # TypeScript ソース
@@ -42,8 +46,6 @@ openai-responses-mcp/
   ├─ package.json
   └─ tsconfig.json
 ```
-
-> リポジトリ運用は任意。ここでは ZIP 展開を前提とします。
 
 ---
 
@@ -105,6 +107,9 @@ node build/index.js --help
 # 実効設定の確認（sources に反映元が出る。stderr に JSON 出力）
 node build/index.js --show-config 2> effective.json
 
+# デバッグログをファイルへ出力
+node build/index.js --stdio --debug ./_debug.log
+
 # YAML を使う場合（利用者が用意した設定ファイルを指定）
 # - 例: ./config/config.yaml を作成する場合は `config/config.yaml.example` をコピーして編集する
 node build/index.js --show-config --config ./config/config.yaml 2> effective.json
@@ -116,7 +121,7 @@ MODEL_ANSWER=gpt-5.2-chat-latest node build/index.js --show-config 2> effective.
 期待例（抜粋、`MODEL_ANSWER` を設定した場合）:
 ```json
 {
-  "version": "0.9.0",
+  "version": "0.10.1",
   "sources": { "ts_defaults": true, "env": ["MODEL_ANSWER"], "cli": [] },
   "effective": { "model_profiles": { "answer": { "model": "gpt-5.2-chat-latest", "reasoning_effort": "medium", "verbosity": "medium" } } }
 }
@@ -124,7 +129,7 @@ MODEL_ANSWER=gpt-5.2-chat-latest node build/index.js --show-config 2> effective.
 
 ---
 
-## 8. インストール先の確認（ローカル/グローバル/npx）
+## 8. インストール先の確認（ローカル/グローバル）
 
 ### 8.1 ローカル（プロジェクト配下 or tgz 擬似インストール時）
 `npm i` や `npm i <tgz>` を実行した直後であれば、カレントの `node_modules` に配置されます。
@@ -144,17 +149,6 @@ ls -la node_modules/.bin
 npm bin -g
 which openai-responses-mcp
 ```
-
-### 8.3 npx 実行時（キャッシュ）
-`npx openai-responses-mcp@latest` は npm のキャッシュ配下に一時取得されて実行されます（パスは内部実装に依存）。
-動作の流れは verbose で確認できます。
-
-```
-npx -y openai-responses-mcp@latest --version --loglevel=verbose
-npm config get cache   # キャッシュディレクトリの場所
-```
-
-> 注意: `npx` のキャッシュ場所は環境や npm のバージョンにより異なります。恒久的に場所を固定したい場合は、ローカル（プロジェクト）またはグローバルに通常インストールしてください。
 
 ---
 

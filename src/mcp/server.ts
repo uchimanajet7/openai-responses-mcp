@@ -65,7 +65,7 @@ export function startServer(cfg: Config) {
     if (msg.method === "initialize" && msg.id !== undefined) {
       const res = {
         protocolVersion: PROTOCOL,
-        // 本サーバは roots を未実装のため広告しない。tools のみ。
+        // 本サーバは tools のみ広告する。
         capabilities: { tools: {} },
         serverInfo: { name: "openai-responses-mcp", version: pkgVersion() }
       };

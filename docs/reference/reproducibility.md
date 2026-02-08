@@ -1,14 +1,14 @@
 
 # 再現性・再構築ガイド — `docs/reference/reproducibility.md`
-最終更新: 2026-01-14 Asia/Tokyo
+最終更新: 2026-02-08 Asia/Tokyo
 
 この文書は **openai-responses-mcp** の結果・挙動を**できる限り再現**するための運用規約と具体手順を定義します。  
-「npm 固定」「安定版のみ」「要約禁止」の方針に準拠します。
+「npm 固定」「安定版のみ」の方針に準拠します。
 
 ---
 
 ## 1. LLM＋検索の非決定性に関する前提と限界
-再現性を阻害しうる要因を先に明示します。完全決定性は**保証しません**。
+再現性を阻害しうる要因を先に明示します。
 
 - **LLM 非決定性**：OpenAI 側仕様のため、温度設定固定でも同一応答が出ない可能性がある。
 - **web_search の可変性**：インデックス更新、ランク変動、記事の改稿・削除。
@@ -20,7 +20,7 @@
 ---
 
 ## 2. 強制するバージョン固定
-- **Node**: 同一メジャーを全員で使用。推奨は v24 系。
+- **Node.js**: 同一メジャーを全員で使用。推奨は v20 系。
 - `package.json` の `engines.node` を利用する。例: `">=20"`。
   - 任意: 推奨は `.nvmrc` / `volta` / `asdf` 等で OS ローカル固定。*npm 固定の方針に反しない*。
 - **npm**: Node 同梱を使用。依存導入は `package-lock.json` 前提で **`npm ci`** を優先する。
@@ -141,4 +141,4 @@ node -e "require('fs').mkdirSync('.snapshots',{recursive:true})"
 - `npm run mcp:smoke:ldjson > .snapshots/mcp-ldjson.out`
 - 任意: `npm run mcp:smoke > .snapshots/mcp-content-length.out`。`OPENAI_API_KEY` が必要です。
 
-以上 3 点が揃っていれば、**誰でも**同じ配置・同じバージョンで**同等結果**を再現できます。
+以上 3 点が揃っていれば、誰でも同じ配置・同じバージョンで同等結果の再現性を高められます。
