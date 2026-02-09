@@ -5,7 +5,7 @@
 //   node scripts/deps-check.js
 //
 // 終了コード:
-//   0: 更新不要
+//   0: 更新なし
 //   1: 更新が必要（outdatedあり）
 //   2: 実行エラー
 
@@ -99,7 +99,7 @@ function buildReport(outdatedByName, directNames) {
   lines.push(`[deps-check] 更新候補: ${total} 件`);
 
   if (total === 0) {
-    lines.push("[deps-check] OK: 更新不要（outdatedなし）");
+    lines.push("[deps-check] OK: 更新なし（outdatedなし）");
     return { text: lines.join("\n"), hasUpdates: false };
   }
 

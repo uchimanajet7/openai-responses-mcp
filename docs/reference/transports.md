@@ -13,12 +13,12 @@
 - **双方向**：プロセスの `stdin`/`stdout` を使用。バイナリ不可。**UTF-8** テキスト。
 - **フレーミング**：優先は `Content-Length: <n>\r\n\r\n<payload>` の固定ヘッダ。複数メッセージを連結可能。
 - **互換モード（フォールバック）**：クライアントが Content-Length を送らない場合、**行区切りJSON（NDJSON風）** も受理。受信で行モードを検出した場合、以後のサーバ応答も **JSON + `\n`** で返す。環境変数 `MCP_LINE_MODE` が `1` の場合は、受信方式に関係なくサーバ応答を **JSON + `\n`** で返す。
-- **ペイロード**：`application/json; charset=utf-8`。改行は任意。推奨は `\n`。
+- **ペイロード**：`application/json; charset=utf-8`。推奨は `\n`。
 - **エンコーディング**：UTF-8。BOM 不可。
 
 ### 1.2 JSON-RPC 互換
 - **バージョン**：`"jsonrpc":"2.0"`。互換。
-- **メソッド**：`initialize` / `tools/list` / `tools/call` / `ping` を使用。`ping` は任意のヘルスチェック。
+- **メソッド**：`initialize` / `tools/list` / `tools/call` / `ping` を使用。`ping` はヘルスチェック。
 - **ID**：数値/文字列いずれも可。リクエストとレスポンスで一致させる。
 
 ### 1.3 初期化
@@ -70,7 +70,7 @@ Content-Length: 128
 {"jsonrpc":"2.0","id":3,"error":{"code":-32001,"message":"answer failed","data":{"message":"..."}}}
 ```
 
-### 1.6 ping（任意のヘルスチェック）
+### 1.6 ping（ヘルスチェック）
 **受信（例）**
 ```http
 Content-Length: 36
@@ -86,7 +86,7 @@ Content-Length: 28
 
 ### 1.7 実装注意点
 - **Content-Length は UTF-8 バイト長**で算出（`Buffer.byteLength(json, 'utf8')`）。
-- ストリームは**フラッシュ**されるまでクライアントに届かない。`stdout.write` 直後に `\n` は不要、ヘッダ末尾の `\r\n\r\n` を忘れない。
+- ストリームは**フラッシュ**されるまでクライアントに届かない。`stdout.write` 直後に `\n` は書かない。ヘッダ末尾の `\r\n\r\n` を忘れない。
 - **バックプレッシャ**：`stdout.write` をそのまま実行する。drain 待機は行わない。
 - **最大メッセージ長**：実装上の固定上限は設けていない。実務では 1～2MB 程度で分割を検討。
 - **並列リクエスト**：ID をキーに同時進行可。順不同応答を許容すること。

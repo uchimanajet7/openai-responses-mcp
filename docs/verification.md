@@ -14,7 +14,7 @@
   npm ci
   npm run build
   ```
-- 注意: OpenAI API を実際に呼ぶ検証（任意の一部ステップ）では `OPENAI_API_KEY` が必要です。
+- 注意: OpenAI API を実際に呼ぶ検証では `OPENAI_API_KEY` が必要です。
 
 ---
 
@@ -34,7 +34,7 @@ node build/index.js --show-config 2> effective.json; cat effective.json | jq '.v
 
 ---
 
-## 2. MCP stdio スモーク（LDJSON, API鍵不要）
+## 2. MCP stdio スモーク（LDJSON）
 ```bash
 npm run mcp:smoke:ldjson | tee ./mcp-smoke-ldjson.out
 
@@ -43,7 +43,7 @@ grep -c '"jsonrpc":"2.0"' ./mcp-smoke-ldjson.out
 ```
 **期待**: `initialize` と `tools/list` の応答が得られる（OpenAI API 呼び出しは行わない）。
 
-### 2-1 追加: ping の確認（API鍵不要・即終了）
+### 2-1 追加: ping の確認
 ```bash
 npm run mcp:smoke:ping | tee ./mcp-smoke-ping.out
 
@@ -93,7 +93,7 @@ node build/index.js --show-config --config ./mcp-config.yaml 2> effective.json; 
 
 ---
 
-## 5. タイムアウト観察（任意, 要 OPENAI_API_KEY）
+## 5. タイムアウト観察（要 OPENAI_API_KEY）
 API 側の都合により再現しづらい場合がありますが、`OPENAI_API_TIMEOUT` を小さくしてタイムアウト（AbortError）を観察できます（タイムアウト時は再試行せず中断）。
 ```bash
 export OPENAI_API_KEY="sk-..."
@@ -130,14 +130,14 @@ npm run mcp:answer -- "本日 YYYY-MM-DD の東京の天気"  # answer
 
 ## 8. キャンセル（notifications/cancelled）の自動テスト
 
-### 8-1 inflightなしのキャンセル（API鍵不要・常時実行）
+### 8-1 inflightなしのキャンセル
 ```bash
 npm run build
 node scripts/test-cancel-noinflight.js
 ```
 **期待**: `initialize` と `ping` の応答が成功し、テストは exit 0。
 
-### 8-2 実行中キャンセルの抑止（要 OPENAI_API_KEY・任意）
+### 8-2 実行中キャンセルの抑止（要 OPENAI_API_KEY）
 ```bash
 export OPENAI_API_KEY="sk-..."
 npm run build
@@ -149,7 +149,7 @@ node scripts/test-cancel-during-call.js
 
 ---
 
-## 9. tools/list のツール定義検証（API鍵不要・常時実行）
+## 9. tools/list のツール定義検証
 ```bash
 npm run build
 node scripts/test-tools-list.js

@@ -47,7 +47,7 @@
   - `initialize`
   - `tools/list`
   - `tools/call`
-  - `ping`：任意。ヘルスチェック用。空オブジェクトで成功応答。
+  - `ping`：ヘルスチェック用。空オブジェクトで成功応答。
 
 ### 2.3 初期化の例
 **受信**
@@ -91,7 +91,6 @@ Content-Length: 204
 ```
 
 ### 2.6 ping
-このメソッドは任意です。
 **受信例**
 ```http
 Content-Length: 36
@@ -251,7 +250,7 @@ model_profiles:
 
 ### 5.2 YAML 既定パス
 - 既定パス: `~/.config/openai-responses-mcp/config.yaml`
-- `--config <path>` を指定した場合はそのファイルを読む。指定しない場合は上記の既定パスを読む。YAML 設定は任意。
+- `--config <path>` を指定した場合はそのファイルを読む。指定しない場合は上記の既定パスを読む。
 
 ### 5.3 代表スキーマ
 ```yaml
@@ -350,7 +349,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 - クライアント通知。片方向。
   - `method`: `notifications/cancelled`
   - `params`: `{ requestId: string | number, reason?: string }`
-  - 通知のため、応答は不要。
+  - 通知なので応答しない。
 
 - サーバー側の動作
   - `tools/call` 開始時に、該当 `id` に対する `AbortController` を作成して登録する。`id → controller`。
@@ -389,7 +388,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 - 有効化の入力源。いずれも同義。優先度：CLI > ENV > YAML。
   - CLI: `--debug` または `--debug <path>`
   - ENV: `DEBUG=1|true|<path>`
-  - YAML: `server.debug: true`。任意で `server.debug_file: <path>` を指定する。
+  - YAML: `server.debug: true` / `server.debug_file: <path>`。
 - 単一判定：アプリ起動時に最終状態を一度だけ確定する。enabled/file。以降は共通関数で判定する。`isDebug()`。起動後にモジュール個別で `process.env.DEBUG` を参照しない。
 - 出力方針：stderr に出力し、`server.debug_file` 指定時はファイルにも出力する。API キーは出力対象に含めない。
 - 出力内容：例。
@@ -618,13 +617,13 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
   - npm CLI: `npm install -g npm@latest` を実行
   - npm 公開設定（Trusted Publishing / OIDC）:
     - npmjs 側で当該 GitHub リポジトリを Trusted Publishers に登録（初回のみ）
-    - Actions 側は `npm publish --provenance --access public` を実行（トークン不要）
+    - Actions 側は `npm publish --provenance --access public` を実行
   - 公開前に `npm pack --dry-run` で同梱物を確認
-  - 任意: GitHub Release ノート生成
+  - GitHub Release ノート生成
 
 ### 17.3 シークレット/環境変数
-- `OPENAI_API_KEY`（任意・ci.yml）: `node scripts/test-cancel-during-call.js` で使用する。未設定の場合はスクリプト側でスキップする。
-- Trusted Publishing では `NPM_TOKEN` は不要。npmjs 側で Trusted Publishers を設定する。
+- `OPENAI_API_KEY`（ci.yml）: `node scripts/test-cancel-during-call.js` で使用する。未設定の場合はスクリプト側でスキップする。
+- Trusted Publishing を使う場合は npmjs 側で Trusted Publishers を設定する。
 
 ### 17.4 参考 YAML（概要）
 以下は実装の骨子（実装時はこの仕様を忠実に反映し、重複や余分な手順は追加しない）。

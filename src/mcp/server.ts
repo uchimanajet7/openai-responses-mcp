@@ -145,7 +145,7 @@ export function startServer(cfg: Config) {
       return;
     }
 
-    // キャンセル通知。通知なので応答不要。
+    // キャンセル通知。通知なので応答しない。
     if (msg.method === "notifications/cancelled") {
       try {
         const rid = (msg?.params as any)?.requestId;

@@ -23,7 +23,7 @@ npm -v
 
 ## 2. 最小構成（必須設定のみで起動）
 - 必須ENV: `OPENAI_API_KEY`
-- 起動（YAML不要）:
+- 起動:
 ```bash
 export OPENAI_API_KEY="sk-..."
 npx openai-responses-mcp@latest --stdio
@@ -75,7 +75,7 @@ export OPENAI_API_KEY="sk-..."
 ---
 
 ## 6. 設定ファイル
-YAML は**任意**です。無くても動作します。TS 既定値と ENV/CLI の設定だけで動作します。
+設定ファイルの配置場所は次のとおりです。
 
 ### 6.1 配置場所
 - 既定: `~/.config/openai-responses-mcp/config.yaml`
@@ -142,7 +142,6 @@ ls -la node_modules/.bin
 ```
 
 ### 8.2 グローバル導入時
-この導入方法は任意です。
 `npm i -g openai-responses-mcp` を実行すると、グローバルの bin ディレクトリに配置されます。通常は `npx` で十分です。
 
 ```
@@ -154,7 +153,7 @@ which openai-responses-mcp
 
 ## 9. 単体スモーク（MCP プロトコル）
 ```bash
-# LDJSON（API鍵不要）
+# LDJSON
 npm run mcp:smoke:ldjson | tee ./mcp-smoke-ldjson.out
 grep -c '"jsonrpc":"2.0"' ./mcp-smoke-ldjson.out
 

@@ -68,7 +68,7 @@ server:
   # デバッグ（詳細ログ）: CLI/ENV/YAML は同義（優先度: CLI > ENV > YAML）
   # - CLI: --debug / --debug <path>
   # - ENV: DEBUG=1|true|<path>
-  # - YAML: server.debug: true（任意で server.debug_file: <path>）
+  # - YAML: server.debug: true / server.debug_file: <path>
   debug: false
   # debug が true のとき、パス指定で stderr をファイルへ同時出力
   debug_file: null

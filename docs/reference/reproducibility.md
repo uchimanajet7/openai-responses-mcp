@@ -22,7 +22,7 @@
 ## 2. 強制するバージョン固定
 - **Node.js**: 同一メジャーを全員で使用。推奨は v20 系。
 - `package.json` の `engines.node` を利用する。例: `">=20"`。
-  - 任意: 推奨は `.nvmrc` / `volta` / `asdf` 等で OS ローカル固定。*npm 固定の方針に反しない*。
+- 推奨は `.nvmrc` / `volta` / `asdf` 等で OS ローカル固定。*npm 固定の方針に反しない*。
 - **npm**: Node 同梱を使用。依存導入は `package-lock.json` 前提で **`npm ci`** を優先する。
 - **依存**: `package-lock.json` を基準にする。依存導入は **`npm ci`** を優先する。
   - 依存を更新したときは **`docs/changelog.md`** と `package-lock.json` を同時更新。
@@ -64,7 +64,7 @@ TZ=Asia/Tokyo node build/index.js --show-config 2> ./effective.json; head -n 5 .
 ## 5. スイート構成としての安定・時事テスト分離
 テストケースを 2 系列に分けます。
 
-### 5.1 API鍵不要の決定性重視 MCP レイヤ
+### 5.1 API呼び出しを含まない決定性重視 MCP レイヤ
 - 期待: `initialize` と `tools/list` の応答形が安定
 ```bash
 node -e "require('fs').mkdirSync('.snapshots',{recursive:true})"
@@ -139,6 +139,6 @@ node -e "require('fs').mkdirSync('.snapshots',{recursive:true})"
 ```
 - `node build/index.js --show-config 2> .snapshots/effective-config.json`
 - `npm run mcp:smoke:ldjson > .snapshots/mcp-ldjson.out`
-- 任意: `npm run mcp:smoke > .snapshots/mcp-content-length.out`。`OPENAI_API_KEY` が必要です。
+- `npm run mcp:smoke > .snapshots/mcp-content-length.out`。`OPENAI_API_KEY` が必要です。
 
 以上 3 点が揃っていれば、誰でも同じ配置・同じバージョンで同等結果の再現性を高められます。

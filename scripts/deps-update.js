@@ -8,7 +8,7 @@
 //   DEPS_UPDATE_YES=1 node scripts/deps-update.js
 //
 // 終了コード:
-//   0: 更新実施（または更新不要）
+//   0: 更新実施（または更新なし）
 //   1: ユーザーが中止
 //   2: 実行エラー
 
@@ -109,7 +109,7 @@ function buildReport(outdatedByName, directNames) {
   lines.push(`[deps-update] 更新候補: ${total} 件`);
 
   if (total === 0) {
-    lines.push("[deps-update] OK: 更新不要（outdatedなし）");
+    lines.push("[deps-update] OK: 更新なし（outdatedなし）");
     return { text: lines.join("\n"), hasUpdates: false, groups, entries };
   }
 
@@ -206,7 +206,7 @@ async function main() {
 
     const { changed, changes } = updatePackageJson(report.entries);
     if (!changed) {
-      console.log("[deps-update] package.json は更新不要でした（想定外）。");
+      console.log("[deps-update] package.json は更新なしでした（想定外）。");
       process.exit(0);
     }
 

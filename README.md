@@ -42,11 +42,11 @@ OpenAI Responses API を推論コアに採用した軽量な MCP サーバです
 ---
 
 ## 必須設定だけで起動できる最小構成
-- 必須設定: 環境変数 `OPENAI_API_KEY` のみ。YAML は不要。
+- 必須設定: 環境変数 `OPENAI_API_KEY` のみ。
 - 起動例:
   - `export OPENAI_API_KEY="sk-..." && npx openai-responses-mcp@latest --stdio`
 
-YAML は任意です。使う場合の既定パスは `~/.config/openai-responses-mcp/config.yaml` です。
+使う場合の既定パスは `~/.config/openai-responses-mcp/config.yaml` です。
 
 ---
 
@@ -114,7 +114,7 @@ npx openai-responses-mcp@latest --stdio
 ```
 最小起動は `--stdio` のみ。必要に応じて `--debug <path>` / `--config <path>` / `--show-config` を付与する。
 
-### 5) 設定（YAML は任意）
+### 5) 設定
 既定パス: `~/.config/openai-responses-mcp/config.yaml`
 
 最小例:
@@ -132,7 +132,7 @@ request:
 ```
 サンプル: `config/config.yaml.example`
 
-外部 policy は任意です。
+外部 policy を使う場合は次のように設定します。
 
 ```yaml
 policy:

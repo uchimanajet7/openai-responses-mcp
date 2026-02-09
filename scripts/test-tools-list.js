@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // テスト目的: tools/list に `answer`/`answer_detailed`/`answer_quick` の3ツールが含まれることを検証。
-// OpenAI API 呼び出しは発生しないため API キー不要。成功で exit 0、失敗で exit 1。
+// OpenAI API 呼び出しは発生しない。成功で exit 0、失敗で exit 1。
 
 import { spawn } from 'node:child_process';
 
@@ -35,4 +35,3 @@ setTimeout(() => {
   }
   process.exit(ok ? 0 : 1);
 }, 1200);
-

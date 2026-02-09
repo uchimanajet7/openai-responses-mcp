@@ -24,7 +24,7 @@ npm -v
 
 ## 2. Node.js の導入（代表パターン）
 - 既に Node が入っている場合はこの節をスキップ。  
-- 管理者権限が不要なユーザ領域インストールを推奨。
+- 管理者権限を使わないユーザ領域インストールを推奨。
 
 ### 2.1 macOS
 - 公式インストーラ（.pkg）または Homebrew（`brew install node@20` 等）。  
@@ -94,7 +94,7 @@ node build/index.js --show-config 2> effective-config.json
 ---
 
 ## 6. 設定
-YAML は任意です。無くても動作します。置く場合の既定パス：
+設定ファイルを配置する場合の既定パス：
 
 - 既定パス: `~/.config/openai-responses-mcp/config.yaml`  
 
@@ -113,7 +113,7 @@ model_profiles:
 
 ## 7. 検証（MCP レイヤ）
 ```bash
-# LDJSON スモーク（OpenAI API鍵不要）
+# LDJSON スモーク
 npm run mcp:smoke:ldjson | tee ./mcp-smoke-ldjson.out
 grep -c '"jsonrpc":"2.0"' ./mcp-smoke-ldjson.out
 
