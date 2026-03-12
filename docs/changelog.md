@@ -2,6 +2,13 @@
 
 本プロジェクトの変更履歴です。日付は Asia/Tokyo 基準です。
 
+## [0.11.0] - 2026-03-12
+- 既定モデル更新: `src/config/defaults.ts` の `model_profiles.answer.model` を `gpt-5.2` から `gpt-5.4` に更新
+- 設定サンプル更新: `config/config.yaml.example` のモデル例を `gpt-5.4` / `gpt-5.3-codex` / `gpt-5-mini` に更新
+- 依存更新: `openai` を `6.18.0` から `6.27.0` に更新
+- 依存更新: `@types/node` を `25.2.2` から `25.4.0` に更新
+- ドキュメントと補助コード: `README.md` / `docs/spec.md` / `docs/reference/config-reference.md` / `docs/reference/environment-setup.md` / `docs/reference/installation.md` / `docs/reference/reproducibility.md` / `docs/reference/transports.md` / `docs/verification.md` / `scripts/deps-check.js` / `scripts/deps-update.js` / `scripts/test-tools-list.js` / `src/mcp/server.ts` の冗長な「任意」「不要」表現を整理
+
 ## [0.10.1] - 2026-02-08
 - 依存更新: `openai` を `6.17.0` から `6.18.0` に更新
 - 依存更新: `@types/node` を `25.2.0` から `25.2.2` に更新
