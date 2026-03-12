@@ -1,6 +1,6 @@
 
 # 再現性・再構築ガイド — `docs/reference/reproducibility.md`
-最終更新: 2026-02-08 Asia/Tokyo
+最終更新: 2026-03-12 Asia/Tokyo
 
 この文書は **openai-responses-mcp** の結果・挙動を**できる限り再現**するための運用規約と具体手順を定義します。  
 「npm 固定」「安定版のみ」の方針に準拠します。
@@ -20,8 +20,8 @@
 ---
 
 ## 2. 強制するバージョン固定
-- **Node.js**: 同一メジャーを全員で使用。推奨は v20 系。
-- `package.json` の `engines.node` を利用する。例: `">=20"`。
+- **Node.js**: 同一メジャーを全員で使用。推奨は v24 系。
+- `package.json` の `engines.node` を利用する。例: `">=24 <25"`。
 - 推奨は `.nvmrc` / `volta` / `asdf` 等で OS ローカル固定。*npm 固定の方針に反しない*。
 - **npm**: Node 同梱を使用。依存導入は `package-lock.json` 前提で **`npm ci`** を優先する。
 - **依存**: `package-lock.json` を基準にする。依存導入は **`npm ci`** を優先する。
@@ -30,7 +30,7 @@
 > 代表設定の例: `package.json`
 ```json
 {
-  "engines": { "node": ">=20" }
+  "engines": { "node": ">=24 <25" }
 }
 ```
 

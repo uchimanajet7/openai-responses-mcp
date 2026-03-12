@@ -1,6 +1,6 @@
 
 # Claude Code 連携手順 — `docs/reference/client-setup-claude.md`
-最終更新: 2026-02-08 Asia/Tokyo
+最終更新: 2026-03-12 Asia/Tokyo
 
 本ドキュメントは **openai-responses-mcp**（stdio）を Claude Code（CLI）に登録して利用するための、
 実務向けの完全手順です。**要約なし**。設定ファイル `~/.claude.json` を前提に、
@@ -9,7 +9,7 @@
 ---
 
 ## 1. 前提（サーバ側）
-- Node.js 20+、npm。
+- Node.js 24 系、npm。
 - OpenAI API キーは **環境変数**で用意（例: `OPENAI_API_KEY`）。
 
 ---

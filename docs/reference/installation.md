@@ -1,6 +1,6 @@
 
 # インストール手順（ローカル / npm）— `docs/reference/installation.md`
-最終更新: 2026-02-08 Asia/Tokyo
+最終更新: 2026-03-12 Asia/Tokyo
 
 本ドキュメントは **openai-responses-mcp** をローカル環境で構築・利用するための**完全な手順**を記載します。  
 **npm 固定**（pnpm/yarn は扱いません）。MCP クライアント（Claude）側の登録は別紙 `client-setup-claude.md` を参照。
@@ -9,7 +9,7 @@
 
 ## 1. 前提条件
 - OS: macOS / Linux
-- Node.js: **v20 以上**
+- Node.js: **v24 系**
 - npm: Node 同梱の安定版
 - OpenAI API キー（環境変数で渡す）
 

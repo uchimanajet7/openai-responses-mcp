@@ -35,7 +35,7 @@ OpenAI Responses API を推論コアに採用した軽量な MCP サーバです
 
 ## 要件
 - OS: macOS / Linux
-- Node.js: 必須は v20 以上。CI は v20 系で検証。
+- Node.js: 必須は v24 系。CI / Release ともに v24 系で運用。
 - npm（Node 同梱）
 - OpenAI API キー（環境変数で渡す）
 

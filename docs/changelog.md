@@ -2,6 +2,11 @@
 
 本プロジェクトの変更履歴です。日付は Asia/Tokyo 基準です。
 
+## [1.0.0] - 2026-03-12
+- breaking: サポートする Node.js を 24 系へ引き上げ、`package.json` / `package-lock.json` の `engines.node` を `>=24 <25` に更新
+- CI/CD: GitHub Actions を Node 24 系へ統一し、`actions/checkout@v6` / `actions/setup-node@v6` を使用
+- docs: `README.md` / `docs/spec.md` / `docs/reference/client-setup-claude.md` / `docs/reference/environment-setup.md` / `docs/reference/installation.md` / `docs/reference/reproducibility.md` / `docs/verification.md` の Node 要件を 24 系へ更新
+
 ## [0.11.0] - 2026-03-12
 - 既定モデル更新: `src/config/defaults.ts` の `model_profiles.answer.model` を `gpt-5.2` から `gpt-5.4` に更新
 - 設定サンプル更新: `config/config.yaml.example` のモデル例を `gpt-5.4` / `gpt-5.3-codex` / `gpt-5-mini` に更新

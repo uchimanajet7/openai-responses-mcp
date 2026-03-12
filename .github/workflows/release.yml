@@ -10,13 +10,13 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       # 理由: npm の公開先レジストリを明示して Runner 既定やキャッシュの影響を排除し、常に npmjs 本番を使うため。
       # 注意: この指定（registry-url）は削除しないこと（CI 安定化に必須）。
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           registry-url: https://registry.npmjs.org/
           cache: npm
 

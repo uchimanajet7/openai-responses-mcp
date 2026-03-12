@@ -1,7 +1,7 @@
 
 # 正準仕様。Canonical Spec。 `docs/spec.md`
-最終更新: 2026-02-08 Asia/Tokyo  
-バージョン: **v0.10.1**
+最終更新: 2026-03-12 Asia/Tokyo  
+バージョン: **v1.0.0**
 
 本ドキュメントは **openai-responses-mcp** の仕様を説明します。  
 仕様・挙動は実装を正とします。実装と差異がある場合はドキュメント側を修正します。
@@ -456,14 +456,14 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 
 ### 15.1 必須項目
 - name: `openai-responses-mcp`
-- version: セマンティックバージョニング（現行 `0.10.x`）
+- version: セマンティックバージョニング（現行 `1.0.x`）
 - description: 以下の文言を使用（段階表現「Step N:」は含めない）
   - `Lightweight MCP server (Responses API core). OpenAI integration + web_search.`
 - type: `module`
 - bin: `{ "openai-responses-mcp": "build/index.js" }`
 - files: `["build","config/config.yaml.example","config/policy.md.example","README.md","LICENSE"]`
 - scripts.prepublishOnly: `npm run build`
-- engines.node: `>=20`
+- engines.node: `>=24 <25`
 - license: `MIT`
 
 ### 15.2 推奨メタ（npm ページの利便性向上）
@@ -477,7 +477,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ```json
 {
   "name": "openai-responses-mcp",
-  "version": "0.10.1",
+  "version": "1.0.0",
   "description": "Lightweight MCP server (Responses API core). OpenAI integration + web_search.",
   "type": "module",
   "bin": { "openai-responses-mcp": "build/index.js" },
@@ -489,7 +489,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
     "LICENSE"
   ],
   "scripts": { "prepublishOnly": "npm run build" },
-  "engines": { "node": ">=20" },
+  "engines": { "node": ">=24 <25" },
   "license": "MIT",
   "repository": { "type": "git", "url": "git+https://github.com/uchimanajet7/openai-responses-mcp.git" },
   "homepage": "https://github.com/uchimanajet7/openai-responses-mcp#readme",
@@ -551,7 +551,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 - バージョンは `package.json` の `version` を参照する。
 - 破壊的変更=MAJOR、後方互換の機能追加=MINOR、修正=PATCH。
 - `package-lock.json` の `version` を**手動で書き換えない**（`npm install` が自動整合）。
-- Node は `engines.node: ">=20"` を満たすこと。
+- Node は `engines.node: ">=24 <25"` を満たすこと。
 
 ### 16.2 Changelog（Keep a Changelog 準拠）
 - 位置: `docs/changelog.md`。
@@ -582,7 +582,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
   npm ci
   ```
 
-- CI/配布: lockfile v3 を前提（npm v9+ / Node 20+ を推奨）。
+- CI/配布: lockfile v3 を前提（Node 24.x を前提。GitHub Actions は CI / 配布ともに Node 24.x を使用）。
 
 以上。
 
@@ -600,10 +600,10 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ### 17.2 ワークフロー構成
 - `ci.yml`（PR/Push 検証）
   - トリガ: `pull_request`（全ブランチ）/ `push`（全ブランチ）。
-  - Node: `20.x`（actions/setup-node@v4）。
+  - Node: `24.x`（actions/setup-node@v6）。
   - 手順:
-    1) `actions/checkout@v4`
-    2) `actions/setup-node@v4`（`node-version: 20`, `cache: npm`）
+    1) `actions/checkout@v6`
+    2) `actions/setup-node@v6`（`node-version: 24`, `cache: npm`）
     3) `npm ci`
     4) `npm run build`
     5) `node scripts/test-tools-list.js`
@@ -613,7 +613,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 - `release.yml`（タグ push: 自動リリース — Trusted Publishing を採用）
   - トリガ: `push` with `tags: ["v*"]`
   - 権限: `permissions: { contents: write, id-token: write }`
-  - Node: `20.x`、`registry-url: https://registry.npmjs.org/`
+  - Node: `24.x`、`registry-url: https://registry.npmjs.org/`
   - npm CLI: `npm install -g npm@latest` を実行
   - npm 公開設定（Trusted Publishing / OIDC）:
     - npmjs 側で当該 GitHub リポジトリを Trusted Publishers に登録（初回のみ）
@@ -639,11 +639,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: 24
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
@@ -672,10 +672,10 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           registry-url: https://registry.npmjs.org/
           cache: npm
       - name: Update npm (latest)
