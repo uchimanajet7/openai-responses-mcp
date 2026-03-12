@@ -621,6 +621,15 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
   - 公開前に `npm pack --dry-run` で同梱物を確認
   - GitHub Release ノート生成
 
+- `dependabot.yml`（週次依存更新）
+  - 配置: `.github/dependabot.yml`
+  - 対象 ecosystem: `npm` と `github-actions`
+  - 対象 directory: いずれも `/`
+  - スケジュール: `weekly`。`monday` の `09:00`、`Asia/Tokyo`
+  - 目的:
+    1) `package.json` / `package-lock.json` の依存関係更新を定期検知する
+    2) `.github/workflows/*.yml` で使用している GitHub Actions の更新を定期検知する
+
 ### 17.3 シークレット/環境変数
 - `OPENAI_API_KEY`（ci.yml）: `node scripts/test-cancel-during-call.js` で使用する。未設定の場合はスクリプト側でスキップする。
 - Trusted Publishing を使う場合は npmjs 側で Trusted Publishers を設定する。
