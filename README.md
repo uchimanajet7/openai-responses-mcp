@@ -122,7 +122,7 @@ npx openai-responses-mcp@latest --stdio
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5.2
+    model: gpt-5.5
     reasoning_effort: medium
     verbosity: medium
 

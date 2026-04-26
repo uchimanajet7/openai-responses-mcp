@@ -2,6 +2,10 @@
 
 本プロジェクトの変更履歴です。日付は Asia/Tokyo 基準です。
 
+## [Unreleased] - 2026-04-26
+- 既定モデル更新: OpenAI 公式ドキュメントの GPT-5.5 案内に合わせ、`src/config/defaults.ts` の `model_profiles.answer.model` を `gpt-5.4` から `gpt-5.5` に更新
+- 設定サンプル更新: `config/config.yaml.example` とドキュメント内の既定モデル例を `gpt-5.5` に統一
+
 ## [1.0.0] - 2026-03-12
 - breaking: サポートする Node.js を 24 系へ引き上げ、`package.json` / `package-lock.json` の `engines.node` を `>=24 <25` に更新
 - CI/CD: GitHub Actions を Node 24 系へ統一し、`actions/checkout@v6` / `actions/setup-node@v6` を使用

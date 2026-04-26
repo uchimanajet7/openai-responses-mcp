@@ -1,6 +1,6 @@
 
 # Claude Code 連携手順 — `docs/reference/client-setup-claude.md`
-最終更新: 2026-03-12 Asia/Tokyo
+最終更新: 2026-04-26 Asia/Tokyo
 
 本ドキュメントは **openai-responses-mcp**（stdio）を Claude Code（CLI）に登録して利用するための、
 実務向けの完全手順です。**要約なし**。設定ファイル `~/.claude.json` を前提に、
@@ -38,15 +38,15 @@ Claude Code（CLI）は、ユーザー設定ファイル `~/.claude.json` の **
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5.2
+    model: gpt-5.5
     reasoning_effort: medium
     verbosity: medium
   answer_detailed:
-    model: gpt-5.1-codex
+    model: gpt-5.5
     reasoning_effort: high
     verbosity: high
   answer_quick:
-    model: gpt-5.2-chat-latest
+    model: gpt-5.5
     reasoning_effort: low
     verbosity: low
 ```

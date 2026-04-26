@@ -1,7 +1,7 @@
 
 # 検証手順（E2E）— openai-responses-mcp
 
-最終更新: 2026-03-12 Asia/Tokyo  
+最終更新: 2026-04-26 Asia/Tokyo  
 このファイルはローカルでの再現・確認手順を示します。出力は **JSON を機械的に検査**できる形を優先し、`jq` での確認例も併記します。
 
 ---
@@ -30,7 +30,7 @@ node build/index.js --help
 # 素の状態
 node build/index.js --show-config 2> effective.json; cat effective.json | jq '.version, .sources, .effective.model_profiles.answer.model'
 ```
-**期待**: `sources.ts_defaults=true` が含まれ、`effective.model_profiles.answer.model` が既定（`gpt-5.2`）。
+**期待**: `sources.ts_defaults=true` が含まれ、`effective.model_profiles.answer.model` が既定（`gpt-5.5`）。
 
 ---
 
@@ -73,23 +73,23 @@ grep -c '^Content-Length:' ./mcp-smoke.out
 ## 4. 優先順位の検証: ENV > YAML > TS defaults
 ### 4-1 ENV 上書き
 ```bash
-MODEL_ANSWER="gpt-5.2-chat-latest" node build/index.js --show-config 2> effective.json; cat effective.json | jq '.effective.model_profiles.answer.model'
+MODEL_ANSWER="gpt-5.5-pro" node build/index.js --show-config 2> effective.json; cat effective.json | jq '.effective.model_profiles.answer.model'
 ```
-**期待**: `"gpt-5.2-chat-latest"`
+**期待**: `"gpt-5.5-pro"`
 
 ### 4-2 YAML の読み込み
 ```bash
 cat > ./mcp-config.yaml <<'YAML'
 model_profiles:
   answer:
-    model: gpt-5.1-codex
+    model: gpt-5.5-pro
     reasoning_effort: high
     verbosity: high
 YAML
 
 node build/index.js --show-config --config ./mcp-config.yaml 2> effective.json; cat effective.json | jq '.sources, .effective.model_profiles.answer.model'
 ```
-**期待**: `.sources.yaml` が `./mcp-config.yaml` を指し、`"gpt-5.1-codex"`。
+**期待**: `.sources.yaml` が `./mcp-config.yaml` を指し、`"gpt-5.5-pro"`。
 
 ---
 
