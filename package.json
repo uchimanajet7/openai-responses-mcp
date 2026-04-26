@@ -1,6 +1,6 @@
 {
   "name": "openai-responses-mcp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Lightweight MCP server (Responses API core). OpenAI integration + web_search.",
   "type": "module",
   "bin": {

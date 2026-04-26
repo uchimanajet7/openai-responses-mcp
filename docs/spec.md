@@ -1,7 +1,7 @@
 
 # 正準仕様。Canonical Spec。 `docs/spec.md`
 最終更新: 2026-04-26 Asia/Tokyo  
-バージョン: **v1.0.0**
+バージョン: **v1.1.0**
 
 本ドキュメントは **openai-responses-mcp** の仕様を説明します。  
 仕様・挙動は実装を正とします。実装と差異がある場合はドキュメント側を修正します。
@@ -477,7 +477,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ```json
 {
   "name": "openai-responses-mcp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Lightweight MCP server (Responses API core). OpenAI integration + web_search.",
   "type": "module",
   "bin": { "openai-responses-mcp": "build/index.js" },

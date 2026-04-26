@@ -121,7 +121,7 @@ MODEL_ANSWER=gpt-5.5-pro node build/index.js --show-config 2> effective.json
 期待例（抜粋、`MODEL_ANSWER` を設定した場合）:
 ```json
 {
-  "version": "0.10.1",
+  "version": "1.1.0",
   "sources": { "ts_defaults": true, "env": ["MODEL_ANSWER"], "cli": [] },
   "effective": { "model_profiles": { "answer": { "model": "gpt-5.5-pro", "reasoning_effort": "medium", "verbosity": "medium" } } }
 }
