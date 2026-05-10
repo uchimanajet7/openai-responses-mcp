@@ -2,6 +2,12 @@
 
 本プロジェクトの変更履歴です。日付は Asia/Tokyo 基準です。
 
+## [1.1.1] - 2026-05-10
+- 依存更新: `openai` を `6.34.0` から `6.37.0` に更新
+- 依存更新: `yaml` を `2.8.3` から `2.8.4` に更新
+- 依存更新: `@types/node` を `25.6.0` から `25.6.2` に更新
+- CI/CD: Dependabot の npm 依存更新確認を追加
+
 ## [1.1.0] - 2026-04-26
 - 既定モデル更新: OpenAI 公式ドキュメントの GPT-5.5 案内に合わせ、`src/config/defaults.ts` の `model_profiles.answer.model` を `gpt-5.4` から `gpt-5.5` に更新
 - 設定サンプル更新: `config/config.yaml.example` とドキュメント内の既定モデル例を `gpt-5.5` に統一
