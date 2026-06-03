@@ -9,11 +9,12 @@
 ## 0. 前提条件
 - Node.js 24 系、npm
 - jq（JSON 解析の確認で使用）
-- 依存とビルド（再現性重視）:
+- 新規の環境での依存とビルド:
   ```bash
   npm ci
   npm run build
   ```
+- 既存の開発環境で依存関係とビルド生成物を作り直す場合は `npm run build:fresh` を実行する。
 - 注意: OpenAI API を実際に呼ぶ検証では `OPENAI_API_KEY` が必要です。
 
 ---
@@ -132,7 +133,7 @@ npm run mcp:answer -- "本日 YYYY-MM-DD の東京の天気"  # answer
 
 ### 8-1 inflightなしのキャンセル
 ```bash
-npm run build
+npm run build:clean
 node scripts/test-cancel-noinflight.js
 ```
 **期待**: `initialize` と `ping` の応答が成功し、テストは exit 0。
@@ -140,7 +141,7 @@ node scripts/test-cancel-noinflight.js
 ### 8-2 実行中キャンセルの抑止（要 OPENAI_API_KEY）
 ```bash
 export OPENAI_API_KEY="sk-..."
-npm run build
+npm run build:clean
 node scripts/test-cancel-during-call.js
 ```
 **期待**: キャンセル後に `id:3` の `result/error` は出ず、テストは `[test] OK: no response for id=3 after cancel` を表示して exit 0。
@@ -151,7 +152,7 @@ node scripts/test-cancel-during-call.js
 
 ## 9. tools/list のツール定義検証
 ```bash
-npm run build
+npm run build:clean
 node scripts/test-tools-list.js
 ```
 **期待**: `answer` / `answer_detailed` / `answer_quick` の3ツールが含まれる。テストは exit 0。

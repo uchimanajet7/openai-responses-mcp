@@ -8,11 +8,12 @@
 ---
 
 ## 1. クイックスタート
-- 1) 依存導入: `npm ci`
-- 2) ビルド: `npm run build`
-- 3) 実効設定の保存: `node build/index.js --show-config 2> effective-config.json`
-- 4) 最小起動: `node build/index.js --stdio`
-- 5) スモーク: `npm run mcp:smoke:ldjson`
+- 1) 新規の環境: `npm ci` の後に `npm run build`
+- 2) 既存の開発環境で依存関係とビルド生成物を作り直す: `npm run build:fresh`
+- 3) 既存の開発環境でビルド生成物だけを作り直す: `npm run build:clean`
+- 4) 実効設定の保存: `node build/index.js --show-config 2> effective-config.json`
+- 5) 最小起動: `node build/index.js --stdio`
+- 6) スモーク: `npm run mcp:smoke:ldjson`
 
 > API キーは **環境変数**で渡します。OpenAI API を呼び出すスモークや実行で必要です。例: `export OPENAI_API_KEY="sk-..."`。
 
@@ -48,7 +49,7 @@ openai-responses-mcp/
   │   ├─ mcp/             # protocol/server（stdio JSON-RPC + framing）
   │   └─ tools/           # answer（Responses API + web_search）
   ├─ scripts/             # mcp-smoke.js / mcp-smoke-ldjson.js など
-  ├─ build/               # ビルド生成物（`npm run build` 後に生成）
+  ├─ build/               # ビルド生成物（`npm run build` / `npm run build:clean` / `npm run build:fresh` 後に生成）
   ├─ config/
   │   └─ config.yaml.example
   ├─ docs/                # ← 本フォルダ（仕様・運用・参照）

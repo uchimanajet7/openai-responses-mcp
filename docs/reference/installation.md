@@ -50,6 +50,8 @@ openai-responses-mcp/
 ---
 
 ## 4. 依存インストールとビルド
+新規の環境では、依存関係を `package-lock.json` から作成してからビルドします。
+
 ```bash
 # プロジェクト直下
 npm ci
@@ -57,6 +59,7 @@ npm run build
 ```
 
 - 成功すると `build/index.js` が生成されます。
+- 既存の開発環境で依存関係とビルド生成物を作り直す場合は `npm run build:fresh` を実行します。
 - 以降、CLI は `node build/index.js` または `npx openai-responses-mcp`（npm パッケージとして導入時）で起動可能。
 
 ---
@@ -132,7 +135,7 @@ MODEL_ANSWER=gpt-5.5-pro node build/index.js --show-config 2> effective.json
 ## 8. インストール先の確認（ローカル/グローバル）
 
 ### 8.1 ローカル（プロジェクト配下 or tgz 擬似インストール時）
-`npm i` や `npm i <tgz>` を実行した直後であれば、カレントの `node_modules` に配置されます。
+`npm install` や `npm install <tgz>` を実行した直後であれば、カレントの `node_modules` に配置されます。
 
 例（tgz 擬似インストール手順の続き）:
 ```
@@ -142,7 +145,7 @@ ls -la node_modules/.bin
 ```
 
 ### 8.2 グローバル導入時
-`npm i -g openai-responses-mcp` を実行すると、グローバルの bin ディレクトリに配置されます。通常は `npx` で十分です。
+`npm install -g openai-responses-mcp` を実行すると、グローバルの bin ディレクトリに配置されます。通常は `npx` で十分です。
 
 ```
 npm bin -g
@@ -192,7 +195,7 @@ npm pack
 # 一時ディレクトリで検証
 TMP=$(mktemp -d); pushd "$TMP" >/dev/null
 npm init -y >/dev/null
-npm i "$OLDPWD"/openai-responses-mcp-*.tgz >/dev/null
+npm install "$OLDPWD"/openai-responses-mcp-*.tgz >/dev/null
 npx openai-responses-mcp --help
 npx openai-responses-mcp --version
 popd >/dev/null
@@ -203,15 +206,16 @@ popd >/dev/null
 ---
 
 ## 12. アンインストール / クリーンアップ
-- ローカル依存の削除: `rm -rf node_modules/`
-- ビルド生成物の削除: `rm -rf build/`
+- ローカル依存の再作成: `npm run deps:install`
+- ビルド生成物の削除: `npm run clean:build`
+- 依存関係とビルド生成物を作り直す: `npm run build:fresh`
 - npm グローバル導入をしている場合の削除: `npm uninstall -g openai-responses-mcp`
 
 ---
 
 ## 13. トラブルシュート
 - **Missing API key**: `OPENAI_API_KEY` 未設定。ENV を見直す。
-- **Cannot find module build/index.js**: `npm run build` 未実行または失敗。
+- **Cannot find module build/index.js**: `npm run build` 未実行または失敗。依存関係も作り直す場合は `npm run build:fresh`。
 - **Content-Length エラー**: バイナリ/改行混入など。再ビルドと `npm run mcp:smoke` を実行。
 - **429/5xx が多発**: リトライ上限は `OPENAI_MAX_RETRIES`（または `request.max_retries`）を上げる。`OPENAI_API_TIMEOUT`（または `request.timeout_ms`）を調整。
 - **モデルの互換性エラー**: `MODEL_ANSWER` を `model_profiles.answer.model` で指定する安定版へ戻す。

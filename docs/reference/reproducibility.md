@@ -23,9 +23,12 @@
 - **Node.js**: 同一メジャーを全員で使用。推奨は v24 系。
 - `package.json` の `engines.node` を利用する。例: `">=24 <25"`。
 - 推奨は `.nvmrc` / `volta` / `asdf` 等で OS ローカル固定。*npm 固定の方針に反しない*。
-- **npm**: Node 同梱を使用。依存導入は `package-lock.json` 前提で **`npm ci`** を優先する。
-- **依存**: `package-lock.json` を基準にする。依存導入は **`npm ci`** を優先する。
+- **npm**: Node 同梱を使用。依存導入は `package-lock.json` 前提で **`npm ci`** を使用する。
+- **依存**: `package-lock.json` を基準にする。依存導入は `npm run deps:install` で行う。
   - 依存を更新したときは **`docs/changelog.md`** と `package-lock.json` を同時更新。
+- **ビルド生成物**: `build/` の削除は `npm run clean:build` で行う。
+- **新規の環境**: チェックアウト後に `npm ci` を実行し、続けて `npm run build` を実行する。
+- **既存の開発環境**: 生成物削除、依存再導入、ビルドをまとめて行う場合は `npm run build:fresh` を使用する。
 
 > 代表設定の例: `package.json`
 ```json
@@ -119,10 +122,13 @@ grep -c '"jsonrpc":"2.0"' .snapshots/mcp-ldjson.out
 
 ## 10. 依存・設定の変更フロー（提案規約）
 1. ブランチで変更（依存・設定・ポリシー）。
-2. `npm ci && npm run build` で再現性を確認。
-3. **全スイート**（安定/時事）を実行し、`.snapshots` を更新。
-4. `docs/changelog.md` を更新。
-5. PR でレビュー（特に **System Policy** の改変は慎重に）。
+2. `npm run deps:check` で直接依存の更新有無を確認。
+3. 依存更新が必要な場合は `npm run deps:update` を実行し、`package.json` と `package-lock.json` を更新。
+4. 新規の環境では `npm ci` と `npm run build` で再現性を確認。
+5. 既存の開発環境では `npm run build:fresh` で生成物削除、依存再導入、ビルドの再現性を確認。
+6. **全スイート**（安定/時事）を実行し、`.snapshots` を更新。
+7. `docs/changelog.md` を更新。
+8. PR でレビュー（特に **System Policy** の改変は慎重に）。
 
 ---
 

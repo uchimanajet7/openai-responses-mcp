@@ -83,7 +83,7 @@ model_profiles:
 ## 6. トラブルシュート
 - **何も表示されない**: `command` が `node` または実行ファイルのパスの場合は **絶対パス**を指定し、参照先と実行権限を確認する。`npx` を使う場合は `npx` がパス環境変数に含まれているかを確認する。
 - **API キー未設定**: `Missing API key: set OPENAI_API_KEY`。設定ファイルの `env` で値を渡す。
-- **フレーミングエラー**: `Content-Length` 不一致。ビルドし直し（`npm run build`）。
+- **フレーミングエラー**: `Content-Length` 不一致。ビルドし直し（`npm run build:clean`）。
 - **Timeout/429**: ネットワーク混雑または API 側都合。自動リトライが入る。
 
 ---

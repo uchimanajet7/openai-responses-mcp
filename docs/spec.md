@@ -462,7 +462,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 - type: `module`
 - bin: `{ "openai-responses-mcp": "build/index.js" }`
 - files: `["build","config/config.yaml.example","config/policy.md.example","README.md","LICENSE"]`
-- scripts.prepublishOnly: `npm run build`
+- scripts.prepublishOnly: `npm run build:clean`
 - engines.node: `>=24 <25`
 - license: `MIT`
 
@@ -488,7 +488,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
     "README.md",
     "LICENSE"
   ],
-  "scripts": { "prepublishOnly": "npm run build" },
+  "scripts": { "prepublishOnly": "npm run build:clean" },
   "engines": { "node": ">=24 <25" },
   "license": "MIT",
   "repository": { "type": "git", "url": "git+https://github.com/uchimanajet7/openai-responses-mcp.git" },
@@ -500,7 +500,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ### 15.4 適用・検証フロー
 1) 仕様との差分を洗い出す（`description` に「Step N:」が残っていないか確認）。
 2) `repository/homepage/bugs` を本仕様のURLで追加。
-3) `npm run build:clean && npm pack --dry-run` で同梱物とメタを確認。
+3) `npm run build:clean` を実行し、続けて `npm pack --dry-run` で同梱物とメタを確認。
 4) 変更理由と影響範囲を `docs/changelog.md` に追記（ユーザー可視）。
 
 注記：本仕様は公開メタデータの最低限を定めるものであり、依存やスクリプトの詳細は上位セクション（機能仕様）に従う。
@@ -560,28 +560,28 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 - 区分例: Added / Changed / Fixed / Removed / Deprecated / Security。
 - リリース確定時: 日付入りの新セクションを先頭に追加する。
 
-### 16.3 Lockfile 運用（npm lockfile v3）
+### 16.3 Lockfile / 依存関係 / クリーンビルド運用（npm lockfile v3）
 - `package-lock.json` は**VCS にコミット**する（再現性のため）。
-- 再生成は **`package.json` 側がソース**。ロックは手動編集禁止。
-- 生成/再生成の手順（再現性の優先度が高い順）:
-
-  1) クリーン再解決（推奨）
-  ```bash
-  rm -rf node_modules package-lock.json
-  npm install
-  ```
-
-  2) 迅速な再解決（最小作業）
-  ```bash
-  rm -f package-lock.json
-  npm install
-  ```
-
-  3) 既存 lock からの再現インストール（再生成はしない）
-  ```bash
-  npm ci
-  ```
-
+- 通常の依存導入は **`package-lock.json` をソース** とし、`npm ci` で再現する。
+- `package-lock.json` は手動編集禁止。依存更新時のみ `npm install` を実行する既存スクリプトで更新する。
+- ビルド手順は実行場所ではなく、環境状態で分ける。
+  - 新規の環境: チェックアウト後に `npm ci` で依存関係を作成し、`npm run build` でビルドする。GitHub Actions の `ci.yml` はこの具体例である。
+  - 既存の開発環境: 既存の `build/` と `node_modules` の状態に依存しないため、`npm run build:fresh` で生成物削除、依存再導入、ビルドを実行する。
+  - 既存の開発環境でビルド生成物だけを作り直す場合: `npm run build:clean` を使用する。
+- `clean` 系スクリプトは対象を分ける。
+  - `clean`: `clean:build` の別名。
+  - `clean:build`: `build/` などのビルド生成物だけを削除する。
+  - `deps:install`: `npm ci` により `node_modules` を `package-lock.json` から作り直す。
+  - `deps:check`: 直接依存の更新有無を確認し、ファイルは変更しない。
+  - `deps:update`: 直接依存を最新へ更新し、`package.json` と `package-lock.json` を更新する。
+  - `build`: 現在の依存状態で TypeScript をビルドする。
+  - `build:clean`: `clean:build` の後に `build` を実行する。
+  - `build:fresh`: 既存の開発環境で `clean:build`、`deps:install`、`build` の順に実行し、新規の環境での依存導入とビルドに近い状態を作る。
+- 最新版を使うことと、lockfile どおりに再現することは別の操作である。
+  - 最新確認: `npm run deps:check`
+  - 最新更新: `npm run deps:update`
+  - lockfile 再現: `npm run deps:install`
+  - 生成物と依存関係を作り直すビルド: `npm run build:fresh`
 - CI/配布: lockfile v3 を前提（Node 24.x を前提。GitHub Actions は CI / 配布ともに Node 24.x を使用）。
 
 以上。
@@ -695,7 +695,7 @@ jobs:
 
 ### 17.5 成果物と公開ポリシー
 - `package.json.files` に指定された最小セットのみを公開（`build/`, `config/*.example`, `README.md`, `LICENSE`, `package.json`）。
-- `prepublishOnly`: `npm run build` を保持（ローカル publish も同一挙動）。
+- `prepublishOnly`: `npm run build:clean` を保持（ローカル publish も同一挙動）。
 - 公開前に `npm pack --dry-run` で同梱物を確認する。
 - 公開後の検証: `npx openai-responses-mcp@latest --stdio` で起動確認。
 

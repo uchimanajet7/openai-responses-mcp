@@ -79,7 +79,7 @@ export NO_PROXY="localhost,127.0.0.1"
 
 ## 5. プロジェクトの初期化（ローカル）
 ```bash
-# 依存取得 & ビルド
+# 新規の環境での依存取得 & ビルド
 npm ci
 npm run build
 

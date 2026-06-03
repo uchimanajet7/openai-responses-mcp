@@ -160,8 +160,13 @@ YAMLでの制御:
 ```bash
 git clone https://github.com/uchimanajet7/openai-responses-mcp.git
 cd openai-responses-mcp
-npm i
+npm ci
 npm run build
+```
+
+既存の開発環境で依存関係とビルド生成物を作り直す場合:
+```bash
+npm run build:fresh
 ```
 
 ### 2) スモークテスト（MCPフレーミング）
