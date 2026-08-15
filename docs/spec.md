@@ -1,7 +1,8 @@
 
 # 正準仕様。Canonical Spec。 `docs/spec.md`
-最終更新: 2026-04-26 Asia/Tokyo  
-バージョン: **v1.1.0**
+最終更新: 2026-08-15 Asia/Tokyo
+
+バージョン: **v1.2.0**
 
 本ドキュメントは **openai-responses-mcp** の仕様を説明します。  
 仕様・挙動は実装を正とします。実装と差異がある場合はドキュメント側を修正します。
@@ -87,7 +88,7 @@ Content-Length: 156
 ```http
 Content-Length: 204
 
-{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"answer\":\"...\",\"used_search\":false,\"citations\":[],\"model\":\"gpt-5.5\"}"}]}}
+{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"answer\":\"...\",\"used_search\":false,\"citations\":[],\"model\":\"gpt-5.6-sol\"}"}]}}
 ```
 
 ### 2.6 ping
@@ -130,11 +131,11 @@ Claude Code等のModel Context Protocol (MCP)クライアントは、ユーザ�
 ```yaml
 model_profiles:
   answer:           # 必須プロファイル
-    model: gpt-5.5
+    model: gpt-5.6-terra
     reasoning_effort: medium
     verbosity: medium
   answer_detailed:  # オプション。省略時は answer で代替。
-    model: gpt-5.5
+    model: gpt-5.6-sol
     reasoning_effort: high
     verbosity: high
   # answer_quick は省略 → answer の設定で動作
@@ -144,7 +145,7 @@ model_profiles:
 ```yaml
 model_profiles:
   answer:  # 必須のみ設定
-    model: gpt-5.5
+    model: gpt-5.6-sol
     reasoning_effort: medium
     verbosity: medium
 # 全ツールがこの設定で動作
@@ -221,9 +222,10 @@ model_profiles:
       "published_at": "YYYY-MM-DD"
     }
   ],
-  "model": "used model id. Example: gpt-5.5"
+  "model": "actual model id returned by the API. Example: gpt-5.6-sol"
 }
 ```
+- `model` は Responses API の `response.model` を返す。要求時に `gpt-5.6` のようなエイリアスを指定した場合も、実際に処理したモデルを記録する。API 応答に `model` が無い場合だけ、要求したモデルIDをフォールバックとして返す。
 - **answer（本文）側の順序規約**：answer（本文）→ 必要に応じて箇条書き → web_search を使い `citations` が 1 件以上ある場合は `Sources:` で **情報源 + ISO 日付**を併記。`citations` が空のときは `Sources:` を付与しない。
   - 情報源は URL が取れる場合は URL を用いる。URL が取れない場合は `oai-weather` 等のソース識別子を用いる。ソース識別子は `web_search_call.action.sources` の `api` ソース等。
 
@@ -262,17 +264,17 @@ request: { timeout_ms: 300000, max_retries: 3 }
 
 model_profiles:
   answer:           # 必須・基準プロファイル
-    model: gpt-5.5
+    model: gpt-5.6-terra
     reasoning_effort: medium
     verbosity: medium
     
   answer_detailed:  # オプション・詳細分析用
-    model: gpt-5.5
+    model: gpt-5.6-sol
     reasoning_effort: high
     verbosity: high
     
   answer_quick:     # オプション・高速回答用
-    model: gpt-5.5
+    model: gpt-5.6-luna
     reasoning_effort: low
     verbosity: low
 
@@ -310,11 +312,18 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ```
 
 ### 5.6 モデル互換性と機能適用範囲
+- TS 既定値は `gpt-5.6-sol` / `medium` / `medium` とする。これは既存の単一プロファイル構成を、GPT-5.6 系の最上位・汎用モデルへ移行しつつ既存の推論強度を維持するためである。
+- GPT-5.6 系の用途別モデルは、最高性能の `gpt-5.6-sol`、知能・速度・コストの均衡を重視する `gpt-5.6-terra`、高スループット・低コスト向けの `gpt-5.6-luna` とする。`gpt-5.6` は `gpt-5.6-sol` を指すエイリアスだが、再現性と観測可能性のため設定例では明示的なモデルIDを使う。
 - `verbosity` の適用: モデルIDの接頭辞が `gpt-5` のときのみ適用する。
 - `reasoning_effort` は `gpt-5` / `o3` / `o4` 系モデルでのみ有効。その他のモデルでは OpenAI Responses API の検証結果に従う（エラーとなる場合がある）。
-- `reasoning_effort` の値: `low` / `medium` / `high` / `xhigh`。既定は `medium`。`xhigh` は extra high。
+- `reasoning_effort` の設定可能値: `none` / `low` / `medium` / `high` / `xhigh` / `max`。既定は `medium`。この全範囲は GPT-5.6 系で利用できる。モデルごとの対応差は Responses API の検証結果に従う。
+- GPT-5.6 の Pro はモデルIDではなく `reasoning.mode: "pro"` で指定する別の実行モードである。v1.2.0 では設定契約に Pro mode を追加せず、従来どおり `reasoning.effort` のみを送信する。したがって `gpt-5.6-pro` というモデルIDは使用しない。
 - 互換性エラーを避けるため、対応モデルIDのみを指定する。
 - マルチプロファイルの継承: `answer_detailed`/`answer_quick` が未定義の場合、`answer` の設定を継承して動作する。
+
+根拠となる公式仕様:
+- [GPT-5.6 migration guidance](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6#migrate-to-gpt-56)
+- [GPT-5.6 Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol) / [GPT-5.6 Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra) / [GPT-5.6 Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna)
 
 ---
 
@@ -323,7 +332,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 2. **プロファイル決定**：選択されたツール名に対応する`model_profiles`設定を取得する。未定義なら`answer`の設定を使う。
 3. **入力検証**: 入力は上流で検証する前提とし、サーバ側では追加の検証を行わない。
 4. **Responses 呼び出し。試行。**：
-   - `model`: プロファイルの`model`値。例: `o3`, `gpt-4.1-mini`.
+   - `model`: プロファイルの`model`値。例: `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`.
    - `instructions`: System Policy。4章に従い `src/policy/system-policy.ts` の `SYSTEM_POLICY` を用いる。
 - `input`: ユーザ `query` に `recency_days` と `max_results` のヒントを常に付与する。`domains` は入力で指定がある場合はそれを使用する。指定が無い場合は設定の `search.defaults.domains` を使用する。`search.defaults.domains` が空配列の場合は付与しない。
    - `tools`: `[{"type":"web_search"}]`。web_search は常時許可する。
@@ -337,6 +346,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
    - `citations[]` は `url_citation` 由来を優先する。`url_citation` が 0 件の場合は `web_search_call.action.sources` 由来で補完する。補完内容は URL と情報源ID。`url_citation` がある場合も **URL 以外の情報源ID** は併記して「どこから検索したか」を維持する。
    - 日付は、公開日が取れない場合は **アクセス日**を Asia/Tokyo の ISO 形式 `YYYY-MM-DD` で用いる。
 7. **応答 JSON 構築**：`answer`（本文）・`used_search`・`citations[]`・`model` を含める。
+   - `model` には Responses API の `response.model` を用いる。API 応答に値が無い場合のみ、要求したモデルIDへフォールバックする。
    - `used_search=true` かつ `citations` が 1 件以上のときは `answer` の本文末尾に `Sources:` を付与し、情報源 + ISO日付を併記する。付与の担保はサーバ側の責務とし、3.2 の出力契約を満たす。`citations` が空のときは付与しない。
 8. **返送**：MCP レスポンスの `content[0].text` に **JSON 文字列**として格納。
 
@@ -419,6 +429,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ---
 
 ## 10. 完了の定義。DoD。
+- GPT-5.6 回帰テストで、既定値 `gpt-5.6-sol`、3つの明示モデルID、`none` から `max` までの推論強度、エイリアス指定時の実モデル記録を自動検証する。
 - 「HTTP 404 の意味」は `answer` の JSON で `used_search=false`、`citations=[]` で返る。
 - 「本日 YYYY-MM-DD の東京の天気」は `answer` の JSON で `used_search=true`、`citations.length>=1`、`answer`（本文）に **情報源 + ISO 日付** を併記。情報源は URL またはソース識別子。
 - `npm run mcp:smoke` が 3 応答を返す。`initialize`。`tools/list`。`tools/call`。`answer`。
@@ -456,7 +467,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 
 ### 15.1 必須項目
 - name: `openai-responses-mcp`
-- version: セマンティックバージョニング（現行 `1.0.x`）
+- version: セマンティックバージョニング（現行 `1.2.x`）
 - description: 以下の文言を使用（段階表現「Step N:」は含めない）
   - `Lightweight MCP server (Responses API core). OpenAI integration + web_search.`
 - type: `module`
@@ -477,7 +488,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ```json
 {
   "name": "openai-responses-mcp",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Lightweight MCP server (Responses API core). OpenAI integration + web_search.",
   "type": "module",
   "bin": { "openai-responses-mcp": "build/index.js" },
@@ -525,7 +536,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
   "answer": "2025-08-09（JST）の東京都の天気は……（略）。\n\nSources:\n- oai-weather (2025-08-09)\n- https://www.jma.go.jp/... (2025-08-09)",
   "used_search": true,
   "citations": [{"url":"oai-weather","title":"api","published_at":"2025-08-09"},{"url":"https://www.jma.go.jp/...","title":"気象庁｜天気予報","published_at":"2025-08-09"}],
-  "model": "gpt-5.5"
+  "model": "gpt-5.6-sol"
 }
 ```
 
@@ -606,9 +617,10 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
     2) `actions/setup-node@v6`（`node-version: 24`, `cache: npm`）
     3) `npm ci`
     4) `npm run build`
-    5) `node scripts/test-tools-list.js`
-    6) `node scripts/test-cancel-noinflight.js`
-    7) `node scripts/test-cancel-during-call.js`
+    5) `node scripts/test-gpt56-support.js`
+    6) `node scripts/test-tools-list.js`
+    7) `node scripts/test-cancel-noinflight.js`
+    8) `node scripts/test-cancel-during-call.js`
 
 - `release.yml`（タグ push: 自動リリース — Trusted Publishing を採用）
   - トリガ: `push` with `tags: ["v*"]`
@@ -656,6 +668,8 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Test (GPT-5.6 support)
+        run: node scripts/test-gpt56-support.js
       - name: Test (tools/list)
         run: node scripts/test-tools-list.js
       - name: Test (cancel-noinflight)

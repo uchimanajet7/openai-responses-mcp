@@ -1,6 +1,12 @@
 import { existsSync, readFileSync } from "node:fs";
 import YAML from "yaml";
-import { defaults, Config } from "./defaults.js";
+import { defaults, REASONING_EFFORTS, type Config, type ReasoningEffort } from "./defaults.js";
+
+const REASONING_EFFORT_SET: ReadonlySet<string> = new Set(REASONING_EFFORTS);
+
+function isReasoningEffort(value: string): value is ReasoningEffort {
+  return REASONING_EFFORT_SET.has(value);
+}
 
 type PartialDeep<T> = { [K in keyof T]?: T[K] extends object ? PartialDeep<T[K]> : T[K] };
 
@@ -46,7 +52,7 @@ function applyEnv(cfg: Config, env: NodeJS.ProcessEnv): Config {
   }
   if (env.ANSWER_EFFORT) {
     const v = String(env.ANSWER_EFFORT).toLowerCase();
-    if (v === 'low' || v === 'medium' || v === 'high' || v === 'xhigh') (copy.model_profiles.answer as any).reasoning_effort = v;
+    if (isReasoningEffort(v)) copy.model_profiles.answer.reasoning_effort = v;
   }
   if (env.ANSWER_VERBOSITY) {
     const v = String(env.ANSWER_VERBOSITY).toLowerCase();
@@ -150,14 +156,13 @@ function validateConfig(cfg: Config): void {
     throw new Error("Config key server.transport was removed; delete it from YAML.");
   }
 
-  const allowedEffort = new Set(["low", "medium", "high", "xhigh"]);
   const profiles = cfg.model_profiles as any;
   for (const name of Object.keys(profiles)) {
     const p = profiles[name];
     if (!p) continue;
     const eff = p.reasoning_effort as string;
-    if (!allowedEffort.has(eff)) {
-      throw new Error(`Invalid model_profiles.${name}.reasoning_effort: ${eff} (allowed: low|medium|high|xhigh)`);
+    if (!REASONING_EFFORT_SET.has(eff)) {
+      throw new Error(`Invalid model_profiles.${name}.reasoning_effort: ${eff} (allowed: ${REASONING_EFFORTS.join("|")})`);
     }
   }
 }

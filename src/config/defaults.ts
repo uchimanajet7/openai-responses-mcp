@@ -1,7 +1,9 @@
+export const REASONING_EFFORTS = ["none", "low", "medium", "high", "xhigh", "max"] as const;
+export type ReasoningEffort = (typeof REASONING_EFFORTS)[number];
+
 export interface ModelProfile {
   model: string;
-  // OpenAI API の reasoning.effort は low | medium | high | xhigh。xhigh は extra high。
-  reasoning_effort: "low" | "medium" | "high" | "xhigh";
+  reasoning_effort: ReasoningEffort;
   verbosity: "low" | "medium" | "high";
 }
 
@@ -35,7 +37,7 @@ export const defaults: Config = {
   },
   model_profiles: {
     answer: {
-      model: "gpt-5.5",
+      model: "gpt-5.6-sol",
       reasoning_effort: "medium",
       verbosity: "medium"
     }

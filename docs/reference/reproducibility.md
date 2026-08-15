@@ -1,6 +1,6 @@
 
 # 再現性・再構築ガイド — `docs/reference/reproducibility.md`
-最終更新: 2026-03-12 Asia/Tokyo
+最終更新: 2026-08-15 Asia/Tokyo
 
 この文書は **openai-responses-mcp** の結果・挙動を**できる限り再現**するための運用規約と具体手順を定義します。  
 「npm 固定」「安定版のみ」の方針に準拠します。
@@ -135,7 +135,7 @@ grep -c '"jsonrpc":"2.0"' .snapshots/mcp-ldjson.out
 ## 11. 既知の再現難ポイントとワークアラウンド
 - **ニュース系**: 記事の公開日時が ISO で取得できない場合がある。本文に**アクセス日**を併記してもらう（System Policy）。
 - **検索結果の順序**: `policy.max_citations` を 1 に絞って**最良 1 件**にすることで差異を小さくする。
-- **モデル更新**: `MODEL_ANSWER` を固定 ID に。更新を許すなら **DoD** を形チェックに限定。
+- **モデル更新**: `MODEL_ANSWER` は `gpt-5.6-sol` / `gpt-5.6-terra` / `gpt-5.6-luna` の明示IDに固定する。`gpt-5.6` エイリアスを使う場合は、MCP 応答の `model`（API の `response.model`）も証跡として保存する。更新を許すなら **DoD** を形チェックに限定。
 
 ---
 

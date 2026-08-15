@@ -1,6 +1,6 @@
 
 # 設定リファレンス — `docs/reference/config-reference.md`
-最終更新: 2026-04-26 Asia/Tokyo
+最終更新: 2026-08-15 Asia/Tokyo
 
 本ドキュメントは **openai-responses-mcp** の設定の参照資料です。  
 設定の**優先順位**は **ENV > YAML > TS defaults**（後勝ち、オブジェクトは深いマージ／配列は置換）。
@@ -37,15 +37,15 @@ openai:
 # マルチプロファイル設定
 model_profiles:
   answer:                          # 基準ツール（必須）
-    model: string                  # 例: gpt-5.5
-    reasoning_effort: string       # low|medium|high|xhigh（推奨）
+    model: string                  # 例: gpt-5.6-terra
+    reasoning_effort: string       # none|low|medium|high|xhigh|max
     verbosity: string              # low|medium|high
   answer_detailed:                 # 詳細分析（オプション）
-    model: string                  # 例: gpt-5.5
+    model: string                  # 例: gpt-5.6-sol
     reasoning_effort: string
     verbosity: string
   answer_quick:                    # 高速回答（オプション）
-    model: string                  # 例: gpt-5.5
+    model: string                  # 例: gpt-5.6-luna
     reasoning_effort: string
     verbosity: string
 
@@ -83,7 +83,7 @@ openai:
 
 # マルチプロファイル既定値
 model_profiles:
-  answer: { model: gpt-5.5, reasoning_effort: medium, verbosity: medium }
+  answer: { model: gpt-5.6-sol, reasoning_effort: medium, verbosity: medium }
 
 request: { timeout_ms: 300000, max_retries: 3 }
 
@@ -105,7 +105,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5.5
+    model: gpt-5.6-sol
     reasoning_effort: medium
     verbosity: medium
 ```
@@ -119,15 +119,15 @@ openai:
 # マルチプロファイル設定（v0.4.0+）
 model_profiles:
   answer_detailed:
-    model: gpt-5.5
+    model: gpt-5.6-sol
     reasoning_effort: high
     verbosity: high
   answer:
-    model: gpt-5.5
+    model: gpt-5.6-terra
     reasoning_effort: medium
     verbosity: medium
   answer_quick:
-    model: gpt-5.5
+    model: gpt-5.6-luna
     reasoning_effort: low
     verbosity: low
 
@@ -150,6 +150,17 @@ server:
   show_config_on_start: true
 ```
 
+### 5.3 GPT-5.6 モデルの選び方
+
+- `gpt-5.6-sol`: 最高性能を優先する詳細分析向け。TS defaults と最小設定の既定モデル。
+- `gpt-5.6-terra`: 知能・速度・コストの均衡を重視する標準回答向け。
+- `gpt-5.6-luna`: 高スループット・低コストを重視する高速回答向け。
+- `gpt-5.6` は `gpt-5.6-sol` のエイリアス。設定の再現性を高めるには上記の明示IDを使用する。
+- GPT-5.6 の Pro はモデルIDではなく Responses API の `reasoning.mode: "pro"` で指定する。v1.2.0 はこの設定項目を公開していないため、`gpt-5.6-pro` は指定しない。
+- MCP 応答の `model` は Responses API の `response.model` を返す。エイリアス指定時も実際に処理したモデルを確認できる。
+
+公式仕様: [GPT-5.6 migration guidance](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6#migrate-to-gpt-56)、[Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol)、[Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra)、[Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna)
+
 ---
 
 ## 6. 環境変数（ENV）
@@ -167,7 +178,7 @@ server:
 | `DEBUG` | 1/true/path | `server.debug`/`server.debug_file` | `1|true` で有効化。`<path>` 指定時は `server.debug=true` と `server.debug_file=<path>` を同時に適用。送受信 JSON が出力されるため回答本文が含まれる。 |
 | `MCP_LINE_MODE` | 1 | MCP stdio の送信形式 | `1` の場合、サーバ応答を `JSON + \n` で送信する |
 | `MODEL_ANSWER` | string | `model_profiles.answer.model` | クイック上書き（恒久はYAMLで設定） |
-| `ANSWER_EFFORT` | enum | `model_profiles.answer.reasoning_effort` | `low`/`medium`/`high`/`xhigh` |
+| `ANSWER_EFFORT` | enum | `model_profiles.answer.reasoning_effort` | `none`/`low`/`medium`/`high`/`xhigh`/`max` |
 | `ANSWER_VERBOSITY` | enum | `model_profiles.answer.verbosity` | `low`/`medium`/`high` |
 
 > `openai.api_key_env` を `MY_KEY` に変えた場合、**`MY_KEY`** を設定してください。`OPENAI_API_KEY` は見られません。
@@ -208,7 +219,7 @@ YAML を読み込んだ場合、`sources.yaml` は `--config` で指定した YA
   },
   "effective": {
     "openai": { "api_key_env": "OPENAI_API_KEY", "base_url": "https://api.openai.com/v1" },
-    "model_profiles": { "answer": { "model": "gpt-5.5", "reasoning_effort": "medium", "verbosity": "medium" } },
+    "model_profiles": { "answer": { "model": "gpt-5.6-sol", "reasoning_effort": "medium", "verbosity": "medium" } },
     "request": { "timeout_ms": 300000, "max_retries": 3 },
     
     "policy": { "max_citations": 3 },
@@ -229,6 +240,7 @@ YAML を読み込んだ場合、`sources.yaml` は `--config` で指定した YA
   
 
 現在は `model_profiles.*.reasoning_effort` のみ起動時にバリデーションします。その他の値はエラーにならず、そのまま適用される場合があります。CI で `--show-config` の JSON（stderr）を検査することを推奨します。
+`reasoning_effort` の許可値は `none` / `low` / `medium` / `high` / `xhigh` / `max` です。指定モデルが個別の値に対応するかは Responses API 側でも検証されます。
 
 ---
 

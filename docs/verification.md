@@ -1,7 +1,8 @@
 
 # 検証手順（E2E）— openai-responses-mcp
 
-最終更新: 2026-04-26 Asia/Tokyo  
+最終更新: 2026-08-15 Asia/Tokyo
+
 このファイルはローカルでの再現・確認手順を示します。出力は **JSON を機械的に検査**できる形を優先し、`jq` での確認例も併記します。
 
 ---
@@ -31,7 +32,13 @@ node build/index.js --help
 # 素の状態
 node build/index.js --show-config 2> effective.json; cat effective.json | jq '.version, .sources, .effective.model_profiles.answer.model'
 ```
-**期待**: `sources.ts_defaults=true` が含まれ、`effective.model_profiles.answer.model` が既定（`gpt-5.5`）。
+**期待**: `sources.ts_defaults=true` が含まれ、`effective.model_profiles.answer.model` が既定（`gpt-5.6-sol`）。
+
+### 1-3 GPT-5.6 設定回帰テスト（API 呼び出しなし）
+```bash
+npm run test:gpt56
+```
+**期待**: `[test] gpt56-support: OK`。既定モデル、Sol/Terra/Luna、`none`〜`max` の推論強度、API実モデルIDの記録を検査する。
 
 ---
 
@@ -74,23 +81,23 @@ grep -c '^Content-Length:' ./mcp-smoke.out
 ## 4. 優先順位の検証: ENV > YAML > TS defaults
 ### 4-1 ENV 上書き
 ```bash
-MODEL_ANSWER="gpt-5.5-pro" node build/index.js --show-config 2> effective.json; cat effective.json | jq '.effective.model_profiles.answer.model'
+MODEL_ANSWER="gpt-5.6-terra" node build/index.js --show-config 2> effective.json; cat effective.json | jq '.effective.model_profiles.answer.model'
 ```
-**期待**: `"gpt-5.5-pro"`
+**期待**: `"gpt-5.6-terra"`
 
 ### 4-2 YAML の読み込み
 ```bash
 cat > ./mcp-config.yaml <<'YAML'
 model_profiles:
   answer:
-    model: gpt-5.5-pro
-    reasoning_effort: high
-    verbosity: high
+    model: gpt-5.6-luna
+    reasoning_effort: low
+    verbosity: low
 YAML
 
 node build/index.js --show-config --config ./mcp-config.yaml 2> effective.json; cat effective.json | jq '.sources, .effective.model_profiles.answer.model'
 ```
-**期待**: `.sources.yaml` が `./mcp-config.yaml` を指し、`"gpt-5.5-pro"`。
+**期待**: `.sources.yaml` が `./mcp-config.yaml` を指し、`"gpt-5.6-luna"`。
 
 ---
 

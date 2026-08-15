@@ -1,6 +1,6 @@
 
 # インストール手順（ローカル / npm）— `docs/reference/installation.md`
-最終更新: 2026-04-26 Asia/Tokyo
+最終更新: 2026-08-15 Asia/Tokyo
 
 本ドキュメントは **openai-responses-mcp** をローカル環境で構築・利用するための**完全な手順**を記載します。  
 **npm 固定**（pnpm/yarn は扱いません）。MCP クライアント（Claude）側の登録は別紙 `client-setup-claude.md` を参照。
@@ -88,7 +88,7 @@ export OPENAI_API_KEY="sk-..."
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5.5
+    model: gpt-5.6-sol
     reasoning_effort: medium
     verbosity: medium
 
@@ -118,17 +118,19 @@ node build/index.js --stdio --debug ./_debug.log
 node build/index.js --show-config --config ./config/config.yaml 2> effective.json
 
 # ENV による一時上書き（例: MODEL_ANSWER）
-MODEL_ANSWER=gpt-5.5-pro node build/index.js --show-config 2> effective.json
+MODEL_ANSWER=gpt-5.6-terra node build/index.js --show-config 2> effective.json
 ```
 
 期待例（抜粋、`MODEL_ANSWER` を設定した場合）:
 ```json
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "sources": { "ts_defaults": true, "env": ["MODEL_ANSWER"], "cli": [] },
-  "effective": { "model_profiles": { "answer": { "model": "gpt-5.5-pro", "reasoning_effort": "medium", "verbosity": "medium" } } }
+  "effective": { "model_profiles": { "answer": { "model": "gpt-5.6-terra", "reasoning_effort": "medium", "verbosity": "medium" } } }
 }
 ```
+
+`gpt-5.6-pro` というモデルIDは使用しません。GPT-5.6 の Pro は `reasoning.mode` で指定する別モードで、v1.2.0 の設定契約には含まれません。
 
 ---
 

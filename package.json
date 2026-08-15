@@ -1,6 +1,6 @@
 {
   "name": "openai-responses-mcp",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Lightweight MCP server (Responses API core). OpenAI integration + web_search.",
   "type": "module",
   "bin": {
@@ -31,7 +31,8 @@
     "mcp:quick": "node scripts/mcp-smoke-apikey.js",
     "mcp:answer": "node scripts/mcp-smoke-apikey.js --tool answer",
     "prepublishOnly": "npm run build:clean",
-    "test": "npm run build:clean && node scripts/test-tools-list.js && node scripts/test-cancel-noinflight.js && node scripts/test-cancel-during-call.js",
+    "test": "npm run build:clean && node scripts/test-gpt56-support.js && node scripts/test-tools-list.js && node scripts/test-cancel-noinflight.js && node scripts/test-cancel-during-call.js",
+    "test:gpt56": "node scripts/test-gpt56-support.js",
     "test:tools-list": "node scripts/test-tools-list.js",
     "test:cancel-noinflight": "node scripts/test-cancel-noinflight.js",
     "test:cancel-during-call": "node scripts/test-cancel-during-call.js"

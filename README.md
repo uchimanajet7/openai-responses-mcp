@@ -122,7 +122,7 @@ npx openai-responses-mcp@latest --stdio
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5.5
+    model: gpt-5.6-sol
     reasoning_effort: medium
     verbosity: medium
 
@@ -130,6 +130,8 @@ request:
   timeout_ms: 300000
   max_retries: 3
 ```
+既定値も `gpt-5.6-sol` / `medium` です。用途別に分ける場合は、詳細分析に `gpt-5.6-sol`、標準回答に `gpt-5.6-terra`、高速回答に `gpt-5.6-luna` を使用する完全例が `config/config.yaml.example` にあります。
+
 サンプル: `config/config.yaml.example`
 
 外部 policy を使う場合は次のように設定します。

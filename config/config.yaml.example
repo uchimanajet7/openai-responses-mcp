@@ -19,29 +19,30 @@ request:
 
 # マルチプロファイル設定
 # 用途に応じて3つのツールプロファイルを提供
+# reasoning_effort: none | low | medium | high | xhigh | max
 model_profiles:
   # 必須・基準プロファイル。未定義の場合は起動後のtools/callでエラーとなる
   answer:
-    model: gpt-5.5
+    model: gpt-5.6-terra
     reasoning_effort: medium
     verbosity: medium
 
   # オプション・詳細分析用（未設定時はanswerで代替）
   answer_detailed:
-    model: gpt-5.5
+    model: gpt-5.6-sol
     reasoning_effort: high
     verbosity: high
 
   # オプション・高速回答用（未設定時はanswerで代替）
   answer_quick:
-    model: gpt-5.5
+    model: gpt-5.6-luna
     reasoning_effort: low
     verbosity: low
 
 # 最小設定例：answerのみ設定して全ツールを同じ設定で使用
 # model_profiles:
 #   answer:
-#     model: gpt-5.5
+#     model: gpt-5.6-sol
 #     reasoning_effort: medium
 #     verbosity: medium
 # # answer_detailed, answer_quick は省略 → answer の設定で動作

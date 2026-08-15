@@ -57,7 +57,7 @@ export async function callResponsesWithRetry(
       const resp = await client.responses.create(args, { signal: controller.signal } as any);
       clearTimeout(to);
       if (externalSignal) externalSignal.removeEventListener('abort', onAbort);
-      return { response: resp, model: args.model };
+      return { response: resp, model: resp.model ?? args.model };
     } catch (e: any) {
       lastError = e;
       // 単一判定に基づくデバッグ出力
