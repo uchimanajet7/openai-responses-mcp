@@ -2,7 +2,7 @@
 # 正準仕様。Canonical Spec。 `docs/spec.md`
 最終更新: 2026-08-15 Asia/Tokyo
 
-バージョン: **v1.2.0**
+バージョン: **v1.2.1**
 
 本ドキュメントは **openai-responses-mcp** の仕様を説明します。  
 仕様・挙動は実装を正とします。実装と差異がある場合はドキュメント側を修正します。
@@ -317,7 +317,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 - `verbosity` の適用: モデルIDの接頭辞が `gpt-5` のときのみ適用する。
 - `reasoning_effort` は `gpt-5` / `o3` / `o4` 系モデルでのみ有効。その他のモデルでは OpenAI Responses API の検証結果に従う（エラーとなる場合がある）。
 - `reasoning_effort` の設定可能値: `none` / `low` / `medium` / `high` / `xhigh` / `max`。既定は `medium`。この全範囲は GPT-5.6 系で利用できる。モデルごとの対応差は Responses API の検証結果に従う。
-- GPT-5.6 の Pro はモデルIDではなく `reasoning.mode: "pro"` で指定する別の実行モードである。v1.2.0 では設定契約に Pro mode を追加せず、従来どおり `reasoning.effort` のみを送信する。したがって `gpt-5.6-pro` というモデルIDは使用しない。
+- GPT-5.6 の Pro はモデルIDではなく `reasoning.mode: "pro"` で指定する別の実行モードである。v1.2.1 では設定契約に Pro mode を追加せず、従来どおり `reasoning.effort` のみを送信する。したがって `gpt-5.6-pro` というモデルIDは使用しない。
 - 互換性エラーを避けるため、対応モデルIDのみを指定する。
 - マルチプロファイルの継承: `answer_detailed`/`answer_quick` が未定義の場合、`answer` の設定を継承して動作する。
 
@@ -488,7 +488,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ```json
 {
   "name": "openai-responses-mcp",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Lightweight MCP server (Responses API core). OpenAI integration + web_search.",
   "type": "module",
   "bin": { "openai-responses-mcp": "build/index.js" },

@@ -156,7 +156,7 @@ server:
 - `gpt-5.6-terra`: 知能・速度・コストの均衡を重視する標準回答向け。
 - `gpt-5.6-luna`: 高スループット・低コストを重視する高速回答向け。
 - `gpt-5.6` は `gpt-5.6-sol` のエイリアス。設定の再現性を高めるには上記の明示IDを使用する。
-- GPT-5.6 の Pro はモデルIDではなく Responses API の `reasoning.mode: "pro"` で指定する。v1.2.0 はこの設定項目を公開していないため、`gpt-5.6-pro` は指定しない。
+- GPT-5.6 の Pro はモデルIDではなく Responses API の `reasoning.mode: "pro"` で指定する。v1.2.1 はこの設定項目を公開していないため、`gpt-5.6-pro` は指定しない。
 - MCP 応答の `model` は Responses API の `response.model` を返す。エイリアス指定時も実際に処理したモデルを確認できる。
 
 公式仕様: [GPT-5.6 migration guidance](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6#migrate-to-gpt-56)、[Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol)、[Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra)、[Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna)

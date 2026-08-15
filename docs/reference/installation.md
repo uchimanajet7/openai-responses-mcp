@@ -124,13 +124,13 @@ MODEL_ANSWER=gpt-5.6-terra node build/index.js --show-config 2> effective.json
 期待例（抜粋、`MODEL_ANSWER` を設定した場合）:
 ```json
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "sources": { "ts_defaults": true, "env": ["MODEL_ANSWER"], "cli": [] },
   "effective": { "model_profiles": { "answer": { "model": "gpt-5.6-terra", "reasoning_effort": "medium", "verbosity": "medium" } } }
 }
 ```
 
-`gpt-5.6-pro` というモデルIDは使用しません。GPT-5.6 の Pro は `reasoning.mode` で指定する別モードで、v1.2.0 の設定契約には含まれません。
+`gpt-5.6-pro` というモデルIDは使用しません。GPT-5.6 の Pro は `reasoning.mode` で指定する別モードで、v1.2.1 の設定契約には含まれません。
 
 ---
 
