@@ -159,6 +159,8 @@ YAMLでの制御:
 ## 開発者向け（クローンして開発）
 
 ### 1) 取得とビルド
+開発には npm 11.19.0 以上が必要です（`npm --version` で確認）。古い場合は、利用中の Node 環境の npm を `npm install -g npm@latest` で更新してください。
+
 ```bash
 git clone https://github.com/uchimanajet7/openai-responses-mcp.git
 cd openai-responses-mcp
@@ -170,6 +172,15 @@ npm run build
 ```bash
 npm run build:fresh
 ```
+
+依存の確認・更新は既存のスクリプトに集約しています。
+
+```bash
+npm run deps:check    # 直接・間接依存の更新候補、脆弱性、スクリプトの承認漏れを確認
+npm run deps:update   # 確認後に依存全体を更新し、更新後の監査を表示
+```
+
+`build:fresh` は lockfile の再現用です。最新版への更新は `deps:update` で行います。未承認の導入時スクリプトは npm が実行前に停止します。承認の判断と更新後の検証手順は [再現性・再構築ガイド](docs/reference/reproducibility.md#10-依存設定の変更フロー) を参照してください。
 
 ### 2) スモークテスト（MCPフレーミング）
 ```bash

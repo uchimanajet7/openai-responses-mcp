@@ -17,11 +17,23 @@ jobs:
           node-version: 24
           cache: 'npm'
 
+      - name: Update npm (latest)
+        run: npm install -g npm@latest
+
       - name: Install dependencies
         run: npm ci
 
+      - name: Audit dependencies
+        run: npm audit --package-lock-only --include=dev --include=optional --include=peer --audit-level=high
+
+      - name: Test (dependency maintenance)
+        run: npm run test:deps
+
       - name: Build
         run: npm run build
+
+      - name: Test (development entry point)
+        run: npm run dev -- --help
 
       - name: Test (GPT-5.6 support)
         run: node scripts/test-gpt56-support.js

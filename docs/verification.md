@@ -1,14 +1,14 @@
 
 # 検証手順（E2E）— openai-responses-mcp
 
-最終更新: 2026-08-15 Asia/Tokyo
+最終更新: 2026-09-07 Asia/Tokyo
 
 このファイルはローカルでの再現・確認手順を示します。出力は **JSON を機械的に検査**できる形を優先し、`jq` での確認例も併記します。
 
 ---
 
 ## 0. 前提条件
-- Node.js 24 系、npm
+- Node.js 24 系、npm 11.19.0 以上（開発・CI の要件。詳細は [再現性・再構築ガイド](reference/reproducibility.md#2-強制するバージョン固定)）
 - jq（JSON 解析の確認で使用）
 - 新規の環境での依存とビルド:
   ```bash
@@ -39,6 +39,27 @@ node build/index.js --show-config 2> effective.json; cat effective.json | jq '.v
 npm run test:gpt56
 ```
 **期待**: `[test] gpt56-support: OK`。既定モデル、Sol/Terra/Luna、`none`〜`max` の推論強度、API実モデルIDの記録を検査する。
+
+### 1-4 依存更新後の検証（API 呼び出しなし）
+```bash
+npm run build:fresh
+npm run test:deps
+npm run test:gpt56
+npm run test:tools-list
+npm run test:cancel-noinflight
+npm run dev -- --help
+npm run deps:check
+```
+
+**期待**: lockfile からの再導入と TypeScript ビルド、依存更新フローの回帰テスト、既存の MCP テスト、`tsx` による開発起動が成功する。`deps:check` は更新候補、全重大度の脆弱性、未承認スクリプトを報告する（終了コード 1 は確認事項あり、2 は確認自体の失敗）。新しい依存に更新候補や脆弱性が見つかった場合は、その内容を判断し、無条件に警告を非表示にしない。
+
+`test:deps` は npm 応答を制御したテストに加え、ローカルの fixture を使って実際の npm が未承認スクリプトを実行前に停止することをネットワークなしで検証する。fixture は `_local/_ai-agent/tmp/` 内に作成し、終了時に削除する。
+
+CI / タグ配布の監査基準だけを確認する場合:
+```bash
+npm audit --package-lock-only --include=dev --include=optional --include=peer --audit-level=high
+```
+**期待**: High / Critical または通信等の監査エラーで失敗し、Low / Moderate のみなら表示を残して成功する。これは自動停止の基準であり、脆弱性がゼロであることと同義ではない。
 
 ---
 

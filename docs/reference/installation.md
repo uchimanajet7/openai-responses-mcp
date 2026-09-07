@@ -1,6 +1,6 @@
 
 # インストール手順（ローカル / npm）— `docs/reference/installation.md`
-最終更新: 2026-08-15 Asia/Tokyo
+最終更新: 2026-09-07 Asia/Tokyo
 
 本ドキュメントは **openai-responses-mcp** をローカル環境で構築・利用するための**完全な手順**を記載します。  
 **npm 固定**（pnpm/yarn は扱いません）。MCP クライアント（Claude）側の登録は別紙 `client-setup-claude.md` を参照。
@@ -10,7 +10,7 @@
 ## 1. 前提条件
 - OS: macOS / Linux
 - Node.js: **v24 系**
-- npm: Node 同梱の安定版
+- npm: 安定版（ソースからの開発は 11.19.0 以上）
 - OpenAI API キー（環境変数で渡す）
 
 > バージョン確認
@@ -50,6 +50,8 @@ openai-responses-mcp/
 ---
 
 ## 4. 依存インストールとビルド
+ソースからの開発には npm 11.19.0 以上を使用します。確認・更新方法は [再現性・再構築ガイド](reproducibility.md#2-強制するバージョン固定) を参照してください。
+
 新規の環境では、依存関係を `package-lock.json` から作成してからビルドします。
 
 ```bash
@@ -124,13 +126,13 @@ MODEL_ANSWER=gpt-5.6-terra node build/index.js --show-config 2> effective.json
 期待例（抜粋、`MODEL_ANSWER` を設定した場合）:
 ```json
 {
-  "version": "1.2.1",
+  "version": "1.2.2",
   "sources": { "ts_defaults": true, "env": ["MODEL_ANSWER"], "cli": [] },
   "effective": { "model_profiles": { "answer": { "model": "gpt-5.6-terra", "reasoning_effort": "medium", "verbosity": "medium" } } }
 }
 ```
 
-`gpt-5.6-pro` というモデルIDは使用しません。GPT-5.6 の Pro は `reasoning.mode` で指定する別モードで、v1.2.1 の設定契約には含まれません。
+`gpt-5.6-pro` というモデルIDは使用しません。GPT-5.6 の Pro は `reasoning.mode` で指定する別モードで、v1.2.2 の設定契約には含まれません。
 
 ---
 

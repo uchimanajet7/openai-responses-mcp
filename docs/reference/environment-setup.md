@@ -1,6 +1,6 @@
 
 # 環境セットアップ（ローカル開発・再現性）— `docs/reference/environment-setup.md`
-最終更新: 2026-08-15 Asia/Tokyo
+最終更新: 2026-09-07 Asia/Tokyo
 
 本ドキュメントは **openai-responses-mcp** をローカルで安定稼働させるための環境準備を、OS 別に具体化した手順です。  
 **npm 固定**。beta/alpha ツールは使いません。
@@ -10,7 +10,7 @@
 ## 1. 要件
 - OS: macOS / Linux
 - Node.js: **v24 系**
-- npm: Node 同梱の安定版
+- npm: 安定版（ソースからの開発は 11.19.0 以上）
 - ネットワーク: `api.openai.com` への HTTPS アクセス
 - OpenAI API キーを **環境変数**で渡す（YAML に秘密は入れない）
 
@@ -78,6 +78,8 @@ export NO_PROXY="localhost,127.0.0.1"
 ---
 
 ## 5. プロジェクトの初期化（ローカル）
+ソースからの開発には npm 11.19.0 以上を使用します。確認・更新方法は [再現性・再構築ガイド](reproducibility.md#2-強制するバージョン固定) を参照してください。
+
 ```bash
 # 新規の環境での依存取得 & ビルド
 npm ci

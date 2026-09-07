@@ -1,6 +1,6 @@
 {
   "name": "openai-responses-mcp",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Lightweight MCP server (Responses API core). OpenAI integration + web_search.",
   "type": "module",
   "bin": {
@@ -31,23 +31,31 @@
     "mcp:quick": "node scripts/mcp-smoke-apikey.js",
     "mcp:answer": "node scripts/mcp-smoke-apikey.js --tool answer",
     "prepublishOnly": "npm run build:clean",
-    "test": "npm run build:clean && node scripts/test-gpt56-support.js && node scripts/test-tools-list.js && node scripts/test-cancel-noinflight.js && node scripts/test-cancel-during-call.js",
+    "test": "npm run test:deps && npm run build:clean && node scripts/test-gpt56-support.js && node scripts/test-tools-list.js && node scripts/test-cancel-noinflight.js && node scripts/test-cancel-during-call.js",
+    "test:deps": "node --test scripts/test-deps.js",
     "test:gpt56": "node scripts/test-gpt56-support.js",
     "test:tools-list": "node scripts/test-tools-list.js",
     "test:cancel-noinflight": "node scripts/test-cancel-noinflight.js",
     "test:cancel-during-call": "node scripts/test-cancel-during-call.js"
   },
   "dependencies": {
-    "openai": "^7.4.0",
+    "openai": "^7.10.0",
     "yaml": "^2.9.0"
   },
   "devDependencies": {
-    "@types/node": "^26.2.0",
-    "tsx": "^4.23.12",
+    "@types/node": "^26.4.1",
+    "tsx": "^4.23.13",
     "typescript": "^7.0.2"
   },
   "engines": {
     "node": ">=24"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.19.0",
+      "onFail": "error"
+    }
   },
   "license": "MIT",
   "repository": {
@@ -73,7 +81,7 @@
     "code"
   ],
   "allowScripts": {
-    "esbuild@0.28.0": true,
-    "fsevents@2.3.3": true
+    "esbuild": true,
+    "fsevents": true
   }
 }

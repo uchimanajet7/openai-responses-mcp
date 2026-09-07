@@ -1,8 +1,8 @@
 
 # 正準仕様。Canonical Spec。 `docs/spec.md`
-最終更新: 2026-08-15 Asia/Tokyo
+最終更新: 2026-09-07 Asia/Tokyo
 
-バージョン: **v1.2.1**
+バージョン: **v1.2.2**
 
 本ドキュメントは **openai-responses-mcp** の仕様を説明します。  
 仕様・挙動は実装を正とします。実装と差異がある場合はドキュメント側を修正します。
@@ -317,7 +317,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 - `verbosity` の適用: モデルIDの接頭辞が `gpt-5` のときのみ適用する。
 - `reasoning_effort` は `gpt-5` / `o3` / `o4` 系モデルでのみ有効。その他のモデルでは OpenAI Responses API の検証結果に従う（エラーとなる場合がある）。
 - `reasoning_effort` の設定可能値: `none` / `low` / `medium` / `high` / `xhigh` / `max`。既定は `medium`。この全範囲は GPT-5.6 系で利用できる。モデルごとの対応差は Responses API の検証結果に従う。
-- GPT-5.6 の Pro はモデルIDではなく `reasoning.mode: "pro"` で指定する別の実行モードである。v1.2.1 では設定契約に Pro mode を追加せず、従来どおり `reasoning.effort` のみを送信する。したがって `gpt-5.6-pro` というモデルIDは使用しない。
+- GPT-5.6 の Pro はモデルIDではなく `reasoning.mode: "pro"` で指定する別の実行モードである。v1.2.2 では設定契約に Pro mode を追加せず、従来どおり `reasoning.effort` のみを送信する。したがって `gpt-5.6-pro` というモデルIDは使用しない。
 - 互換性エラーを避けるため、対応モデルIDのみを指定する。
 - マルチプロファイルの継承: `answer_detailed`/`answer_quick` が未定義の場合、`answer` の設定を継承して動作する。
 
@@ -438,10 +438,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ---
 
 ## 11. 互換性ポリシー。バージョニング。
-- セマンティックバージョニング：
-  - 破壊的変更 → **MAJOR**
-  - 新機能追加。後方互換。→ **MINOR**
-  - バグ修正/依存更新 → **PATCH**
+- 採番の判断基準と版情報の管理は [16.1 バージョニング](#161-バージョニングsemver) に従う。
 - MCP プロトコル `protocolVersion` は現行 **`2025-06-18`** 固定。`initialize` でのネゴシエーションは行わない。
 
 ---
@@ -467,7 +464,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 
 ### 15.1 必須項目
 - name: `openai-responses-mcp`
-- version: セマンティックバージョニング（現行 `1.2.x`）
+- version: [16.1 バージョニング](#161-バージョニングsemver) に従って決定した `package.json` の版
 - description: 以下の文言を使用（段階表現「Step N:」は含めない）
   - `Lightweight MCP server (Responses API core). OpenAI integration + web_search.`
 - type: `module`
@@ -488,7 +485,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ```json
 {
   "name": "openai-responses-mcp",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Lightweight MCP server (Responses API core). OpenAI integration + web_search.",
   "type": "module",
   "bin": { "openai-responses-mcp": "build/index.js" },
@@ -512,7 +509,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 1) 仕様との差分を洗い出す（`description` に「Step N:」が残っていないか確認）。
 2) `repository/homepage/bugs` を本仕様のURLで追加。
 3) `npm run build:clean` を実行し、続けて `npm pack --dry-run` で同梱物とメタを確認。
-4) 変更理由と影響範囲を `docs/changelog.md` に追記（ユーザー可視）。
+4) [16.2 Changelog](#162-changelog) に従い、リリース確定時に変更理由と影響範囲を記録する。
 
 注記：本仕様は公開メタデータの最低限を定めるものであり、依存やスクリプトの詳細は上位セクション（機能仕様）に従う。
 
@@ -559,22 +556,37 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ## 16. バージョニング / Changelog / Lockfile 運用方針
 
 ### 16.1 バージョニング（SemVer）
-- バージョンは `package.json` の `version` を参照する。
-- 破壊的変更=MAJOR、後方互換の機能追加=MINOR、修正=PATCH。
-- `package-lock.json` の `version` を**手動で書き換えない**（`npm install` が自動整合）。
+- 本プロダクトの採番基準は本節に集約する。変更の実体を [変更履歴](./changelog.md) の同種の事例と比較し、利用者に提供する機能と互換性への影響で判定する。
+
+| 区分 | 判断基準 |
+|---|---|
+| MAJOR | 既存の利用方法を壊す機能・API・設定契約・実行要件の変更。 |
+| MINOR | 後方互換の機能追加・拡張。MCPツールや設定機能の追加、既定モデルの更新など。 |
+| PATCH | 公開機能の追加や非互換変更を伴わない不具合修正・依存更新・導入やビルド、CI、依存管理の保守改善。 |
+
+- 複数の区分に該当する変更を含む場合は、影響が最も大きい区分を採用する。影響が未確認なら調査してから採番する。
+- 文書や System Policy の改訂は、実際の機能・挙動と互換性への影響を上表で分類する。文書を編集したことや保守作業の量だけで MINOR に上げない。ソース導入・開発環境の要件は、配布パッケージの実行要件と区別して評価する。
+- 採番はメンテナが確定し、`package.json` の `version` を管理元とする。現行版を記した文書と期待例も同じ版に揃える。過去のリリース履歴の版は書き換えない。
+- 版の反映には `npm version X.Y.Z --no-git-tag-version` を使用し、`package.json` と `package-lock.json` を npm で同期する。`package-lock.json` の `version` は**手動で書き換えない**。コミット・タグ・公開は [17.1](#171-ブランチタグ運用) の別操作として扱う。
 - Node は `engines.node: ">=24 <25"` を満たすこと。
 
-### 16.2 Changelog（Keep a Changelog 準拠）
-- 位置: `docs/changelog.md`。
-- 形式: Keep a Changelog 準拠。セクション順は最新リリース → 過去リリース（新しい順）。
-- タイムゾーン: 日付は Asia/Tokyo。
-- 区分例: Added / Changed / Fixed / Removed / Deprecated / Security。
-- リリース確定時: 日付入りの新セクションを先頭に追加する。
+根拠: [SemVer 2.0.0](https://semver.org/spec/v2.0.0.html)、[npm version](https://docs.npmjs.com/cli/v11/commands/npm-version/)。SemVer が許容する内部改善による MINOR 更新を、本プロダクトの保守修正に一律適用しない。
+
+### 16.2 Changelog
+- 位置: [docs/changelog.md](./changelog.md)。採番と記載内容を決める前に、過去の同種変更の分類・粒度・説明を参照する。
+- 形式: 既存の `## [X.Y.Z] - YYYY-MM-DD` と「分類: 具体的な変更と結果」の箇条書きを使用し、最新リリースから並べる。`Unreleased` セクションは使用しない。
+- 記載対象: 利用者やメンテナに意味のある機能・設定・依存・導入・保守上の変更。依存更新は変更前後の版、修正は対象と改善結果を簡潔に示す。テスト・CI・文書も運用に意味のある変更を記載し、変更ファイルの羅列や軽微な内部整理は載せない。
+- リリース確定時に、メンテナが確定した版と Asia/Tokyo の日付で新セクションを先頭に追加する。採番理由が分かる変更内容を記し、過去のリリースに記載済みの変更を重複掲載しない。
+- 根拠: [Keep a Changelog](https://keepachangelog.com/en/2.0.0/) の「利用者にとって意味のある変更を選んで記録する」という原則を参照する。具体的な書式とリリース時の運用は本節に従う。
 
 ### 16.3 Lockfile / 依存関係 / クリーンビルド運用（npm lockfile v3）
 - `package-lock.json` は**VCS にコミット**する（再現性のため）。
 - 通常の依存導入は **`package-lock.json` をソース** とし、`npm ci` で再現する。
-- `package-lock.json` は手動編集禁止。依存更新時のみ `npm install` を実行する既存スクリプトで更新する。
+- `package-lock.json` は手動編集禁止。依存更新は `npm run deps:update` に集約し、npm に生成させる。
+- 開発・CI は npm 11.19.0 以上を使用し、`devEngines.packageManager` で要件を検査する。これはソースを扱う環境の要件であり、配布パッケージ利用者向けの `engines.npm` は追加しない。
+- `.npmrc` の `omit-lockfile-registry-resolved=true` を保持する。レジストリ URL を lockfile に固定しない既存の導入・配布方針を維持する。
+- 導入時スクリプトは `package.json` の `allowScripts` で管理する。`esbuild` / `fsevents` は名前単位で許可し、同じパッケージの更新ごとに承認を追加しない。これは当該パッケージの将来バージョンにも実行を許可する判断である。
+- `.npmrc` の `strict-allow-scripts=true` により、新しい未承認スクリプトは実行前に停止する。更新スクリプトは承認を自動追加せず、`DEPS_UPDATE_YES` も承認範囲を広げない。
 - ビルド手順は実行場所ではなく、環境状態で分ける。
   - 新規の環境: チェックアウト後に `npm ci` で依存関係を作成し、`npm run build` でビルドする。GitHub Actions の `ci.yml` はこの具体例である。
   - 既存の開発環境: 既存の `build/` と `node_modules` の状態に依存しないため、`npm run build:fresh` で生成物削除、依存再導入、ビルドを実行する。
@@ -583,8 +595,8 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
   - `clean`: `clean:build` の別名。
   - `clean:build`: `build/` などのビルド生成物だけを削除する。
   - `deps:install`: `npm ci` により `node_modules` を `package-lock.json` から作り直す。
-  - `deps:check`: 直接依存の更新有無を確認し、ファイルは変更しない。
-  - `deps:update`: 直接依存を最新へ更新し、`package.json` と `package-lock.json` を更新する。
+  - `deps:check`: 導入済み依存の更新候補を `npm outdated --all` で調べ、直接依存の latest と間接依存の wanted（親依存の制約内）を表示する。制約外の間接依存の latest は参考情報として区別する。lockfile 全体の `npm audit` と `npm install-scripts ls` による承認漏れも確認し、プロジェクトのファイルは変更しない。事前に `npm run deps:install` で開発依存を含めて導入する。
+  - `deps:update`: 確認後、直接依存の指定を latest へ更新（メジャー更新を含み、既存の `^` / `~` を保持）し、パッケージ名を指定しない `npm update` で間接依存も親依存の制約内で更新する。直接依存の変更がない場合も依存全体を再解決する。個別パッケージの固定や `npm audit fix --force` による制約の上書きは行わない。
   - `build`: 現在の依存状態で TypeScript をビルドする。
   - `build:clean`: `clean:build` の後に `build` を実行する。
   - `build:fresh`: 既存の開発環境で `clean:build`、`deps:install`、`build` の順に実行し、新規の環境での依存導入とビルドに近い状態を作る。
@@ -594,6 +606,12 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
   - lockfile 再現: `npm run deps:install`
   - 生成物と依存関係を作り直すビルド: `npm run build:fresh`
 - CI/配布: lockfile v3 を前提（Node 24.x を前提。GitHub Actions は CI / 配布ともに Node 24.x を使用）。
+- 更新前後の監査は開発・optional・peer 依存を含め、全重大度を表示する。High / Critical が残る場合は失敗扱いとし、Low / Moderate は内容と適用条件をメンテナが判断する。通信失敗・不正な JSON は「問題なし」と扱わない。
+- `deps:check` の終了コード: 0=更新候補・脆弱性・未承認スクリプトなし、1=確認事項あり、2=実行エラー。親の制約外の最新版という参考情報だけでは 1 にしない。
+- 別 OS 向けバイナリや利用していない optional peer など、未導入の optional 依存は更新候補に数えない。lockfile に記録された依存の脆弱性は引き続き全体監査の対象とする。
+- `deps:update` の終了コード: 0=依存更新と監査が完了し High / Critical なし、1=更新を中止、2=実行エラーまたは未承認スクリプト、3=更新後も High / Critical が残存。Low / Moderate の残存も明示する。途中失敗時は変更済みの可能性があるファイルを案内し、自動で巻き戻さない。
+- ビルド・テストは更新処理と分離する。更新後は `build:fresh`、`test:deps`、既存の API 通信なしのテスト、`npm run dev -- --help` で再現性と開発用変換処理を確認する。OpenAI API を実際に呼ぶ検証は別途実施する。
+- 根拠: [npm update](https://docs.npmjs.com/cli/v11/commands/npm-update/)、[npm audit](https://docs.npmjs.com/cli/v11/commands/npm-audit/)、[install-script policy](https://docs.npmjs.com/cli/v11/using-npm/config/#strict-allow-scripts)、[devEngines](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#devengines)。
 
 以上。
 
@@ -606,27 +624,33 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 - `main`: リリース対象ブランチ。
 - `feature/*`: 機能開発ブランチ（PR前提）。
 - タグ: `vX.Y.Z` 形式のみをリリーストリガに使用（SemVer）。
-  - バージョンの決定は手動で `package.json` を bump → `git tag vX.Y.Z` → `git push --tags`。
+  - メンテナが [16.1](#161-バージョニングsemver) に従って採番を確定し、版情報と [変更履歴](#162-changelog) を揃える。
+  - レビュー・コミット後、メンテナが公開するコミットに `git tag vX.Y.Z` を付けて `git push --tags` を実行する。版情報の修正だけで公開を実行しない。
 
 ### 17.2 ワークフロー構成
 - `ci.yml`（PR/Push 検証）
   - トリガ: `pull_request`（全ブランチ）/ `push`（全ブランチ）。
-  - Node: `24.x`（actions/setup-node@v6）。
+  - Node: `24.x`（actions/setup-node@v7）。npm は配布ワークフローと同様に `npm@latest` へ更新する。
   - 手順:
-    1) `actions/checkout@v6`
-    2) `actions/setup-node@v6`（`node-version: 24`, `cache: npm`）
-    3) `npm ci`
-    4) `npm run build`
-    5) `node scripts/test-gpt56-support.js`
-    6) `node scripts/test-tools-list.js`
-    7) `node scripts/test-cancel-noinflight.js`
-    8) `node scripts/test-cancel-during-call.js`
+    1) `actions/checkout@v7`
+    2) `actions/setup-node@v7`（`node-version: 24`, `cache: npm`）
+    3) `npm install -g npm@latest`
+    4) `npm ci`
+    5) `npm audit --package-lock-only --include=dev --include=optional --include=peer --audit-level=high`
+    6) `npm run test:deps`
+    7) `npm run build`
+    8) `npm run dev -- --help`
+    9) `node scripts/test-gpt56-support.js`
+    10) `node scripts/test-tools-list.js`
+    11) `node scripts/test-cancel-noinflight.js`
+    12) `node scripts/test-cancel-during-call.js`
 
 - `release.yml`（タグ push: 自動リリース — Trusted Publishing を採用）
   - トリガ: `push` with `tags: ["v*"]`
   - 権限: `permissions: { contents: write, id-token: write }`
   - Node: `24.x`、`registry-url: https://registry.npmjs.org/`
   - npm CLI: `npm install -g npm@latest` を実行
+  - `npm ci` 後、CI と同じ `npm audit --package-lock-only --include=dev --include=optional --include=peer --audit-level=high` を実行し、High / Critical または監査失敗で公開を止める。
   - npm 公開設定（Trusted Publishing / OIDC）:
     - npmjs 側で当該 GitHub リポジトリを Trusted Publishers に登録（初回のみ）
     - Actions 側は `npm publish --provenance --access public` を実行
@@ -635,10 +659,10 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 
 - `dependabot.yml`（週次依存更新）
   - 配置: `.github/dependabot.yml`
-  - 対象 ecosystem: `github-actions`
+  - 対象 ecosystem: `github-actions` / `npm`
   - 対象 directory: `/`
   - スケジュール: `weekly`。`monday` の `09:00`、`Asia/Tokyo`
-  - 目的: `.github/workflows/*.yml` で使用している GitHub Actions の更新を定期検知する
+  - 目的: GitHub Actions と npm 依存の更新を定期検知する。脆弱性に対する security updates の有効化は GitHub リポジトリ設定で別途管理する。
 
 ### 17.3 シークレット/環境変数
 - `OPENAI_API_KEY`（ci.yml）: `node scripts/test-cancel-during-call.js` で使用する。未設定の場合はスクリプト側でスキップする。
@@ -658,16 +682,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: 'npm'
+      - name: Update npm (latest)
+        run: npm install -g npm@latest
       - name: Install dependencies
         run: npm ci
+      - name: Audit dependencies
+        run: npm audit --package-lock-only --include=dev --include=optional --include=peer --audit-level=high
+      - name: Test (dependency maintenance)
+        run: npm run test:deps
       - name: Build
         run: npm run build
+      - name: Test (development entry point)
+        run: npm run dev -- --help
       - name: Test (GPT-5.6 support)
         run: node scripts/test-gpt56-support.js
       - name: Test (tools/list)
@@ -693,8 +725,8 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org/
@@ -702,6 +734,7 @@ jobs:
       - name: Update npm (latest)
         run: npm install -g npm@latest
       - run: npm ci
+      - run: npm audit --package-lock-only --include=dev --include=optional --include=peer --audit-level=high
       - run: npm run build:clean
       - run: npm pack --dry-run
       - run: npm publish --provenance --access public

@@ -26,6 +26,7 @@ jobs:
         run: npm install -g npm@latest
 
       - run: npm ci
+      - run: npm audit --package-lock-only --include=dev --include=optional --include=peer --audit-level=high
       - run: npm run build:clean
 
       # 理由: 公開前に同梱物を検証し、意図しないファイル混入や欠落を早期検知するため。
