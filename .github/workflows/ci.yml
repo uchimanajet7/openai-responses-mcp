@@ -35,8 +35,8 @@ jobs:
       - name: Test (development entry point)
         run: npm run dev -- --help
 
-      - name: Test (GPT-5.6 support)
-        run: node scripts/test-gpt56-support.js
+      - name: Test (model support)
+        run: node scripts/test-model-support.js
 
       - name: Test (tools/list)
         run: node scripts/test-tools-list.js

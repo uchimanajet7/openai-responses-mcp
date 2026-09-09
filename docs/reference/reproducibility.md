@@ -1,6 +1,6 @@
 
 # 再現性・再構築ガイド — `docs/reference/reproducibility.md`
-最終更新: 2026-09-07 Asia/Tokyo
+最終更新: 2026-09-09 Asia/Tokyo
 
 この文書は **openai-responses-mcp** の結果・挙動を**できる限り再現**するための運用規約と具体手順を定義します。  
 「npm 固定」「安定版のみ」の方針に準拠します。
@@ -20,8 +20,8 @@
 ---
 
 ## 2. 強制するバージョン固定
-- **Node.js**: 同一メジャーを全員で使用。推奨は v24 系。
-- `package.json` の `engines.node` を利用する。例: `">=24 <25"`。
+- **Node.js**: 配布要件は24以上。再現性を確認する際は同一メジャーを全員で使用し、CI / Release と同じ24系を推奨する。
+- `package.json` の `engines.node` を利用する。値は `">=24"`。
 - 推奨は `.nvmrc` / `volta` / `asdf` 等で OS ローカル固定。*npm 固定の方針に反しない*。
 - **npm**: 開発・CI は 11.19.0 以上を使用する。`npm --version` で確認し、古い場合は利用中の Node 環境で `npm install -g npm@latest` を実行する。`devEngines.packageManager` が開発環境の要件を検査する。CI / 配布は既存の配布方針に合わせて `npm@latest` を使用する。
 - **依存導入**: `package-lock.json` 前提で **`npm ci`** を使用する。`omit-lockfile-registry-resolved=true` を保持し、取得先は利用環境の npm レジストリ設定から解決する。
@@ -34,7 +34,7 @@
 > 代表設定の例: `package.json`
 ```json
 {
-  "engines": { "node": ">=24 <25" }
+  "engines": { "node": ">=24" }
 }
 ```
 
@@ -141,7 +141,7 @@ CI とタグによる配布では `npm audit --package-lock-only --include=dev -
 ## 11. 既知の再現難ポイントとワークアラウンド
 - **ニュース系**: 記事の公開日時が ISO で取得できない場合がある。本文に**アクセス日**を併記してもらう（System Policy）。
 - **検索結果の順序**: `policy.max_citations` を 1 に絞って**最良 1 件**にすることで差異を小さくする。
-- **モデル更新**: `MODEL_ANSWER` は `gpt-5.6-sol` / `gpt-5.6-terra` / `gpt-5.6-luna` の明示IDに固定する。`gpt-5.6` エイリアスを使う場合は、MCP 応答の `model`（API の `response.model`）も証跡として保存する。更新を許すなら **DoD** を形チェックに限定。
+- **モデル更新**: 既定モデルは `gpt-6-astra`。既定値の更新とは独立してモデルを選ぶ場合は、YAML または `MODEL_ANSWER` にモデルIDを明示する。エイリアスを含め、モデルIDの指定だけでは回答内容の再現を保証しない。MCP 応答の `model`（API の `response.model`）も証跡として保存し、**DoD** に沿って回答と出典を確認する。
 
 ---
 

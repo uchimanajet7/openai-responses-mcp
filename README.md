@@ -35,7 +35,7 @@ OpenAI Responses API を推論コアに採用した軽量な MCP サーバです
 
 ## 要件
 - OS: macOS / Linux
-- Node.js: 必須は v24 系。CI / Release ともに v24 系で運用。
+- Node.js: 24 以上（`engines.node: ">=24"`）。CI / Release は24系で運用。
 - npm（Node 同梱）
 - OpenAI API キー（環境変数で渡す）
 
@@ -122,7 +122,7 @@ npx openai-responses-mcp@latest --stdio
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5.6-sol
+    model: gpt-6-astra
     reasoning_effort: medium
     verbosity: medium
 
@@ -130,7 +130,7 @@ request:
   timeout_ms: 300000
   max_retries: 3
 ```
-既定値も `gpt-5.6-sol` / `medium` です。用途別に分ける場合は、詳細分析に `gpt-5.6-sol`、標準回答に `gpt-5.6-terra`、高速回答に `gpt-5.6-luna` を使用する完全例が `config/config.yaml.example` にあります。
+既定値は `gpt-6-astra`、推論強度・詳しさともに `medium` です。`config/config.yaml.example` には、Astra の推論強度と詳しさを用途別に分けた完全例があります。別モデルは YAML または `MODEL_ANSWER` で指定できます。Astra の対応値と移行時の注意点は [設定リファレンス](docs/reference/config-reference.md#53-モデルと推論強度の選択) を参照してください。
 
 サンプル: `config/config.yaml.example`
 

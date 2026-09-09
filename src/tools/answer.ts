@@ -250,8 +250,9 @@ export async function callAnswer(input: AnswerInput, cfg: Config, profileName?: 
   }
 
   // モデル互換性チェック
-  const supportsVerbosity = profile.model.startsWith('gpt-5');
-  const supportsReasoningEffort = profile.model.startsWith('gpt-5') ||
+  const isGpt5Or6 = profile.model.startsWith('gpt-5') || profile.model.startsWith('gpt-6');
+  const supportsVerbosity = isGpt5Or6;
+  const supportsReasoningEffort = isGpt5Or6 ||
                                   profile.model.startsWith('o3') ||
                                   profile.model.startsWith('o4');
 

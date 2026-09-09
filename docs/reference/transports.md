@@ -1,6 +1,6 @@
 
 # Transports — `docs/reference/transports.md`
-最終更新: 2026-08-15 Asia/Tokyo
+最終更新: 2026-09-09 Asia/Tokyo
 
 本ドキュメントは **openai-responses-mcp** が実装するトランスポート仕様を記述します。  
 現行は **stdio** のみ実装。
@@ -58,9 +58,9 @@ Content-Length: 156
 ```
 **送信（例・成功、本文は `answer` に格納）**
 ```http
-Content-Length: 204
+Content-Length: 158
 
-{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"answer\":\"...\",\"used_search\":false,\"citations\":[],\"model\":\"gpt-5.6-sol\"}"}]}}
+{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"{\"answer\":\"...\",\"used_search\":false,\"citations\":[],\"model\":\"gpt-6-astra\"}"}]}}
 ```
 
 **送信（例・エラー）**

@@ -37,7 +37,7 @@ export const defaults: Config = {
   },
   model_profiles: {
     answer: {
-      model: "gpt-5.6-sol",
+      model: "gpt-6-astra",
       reasoning_effort: "medium",
       verbosity: "medium"
     }

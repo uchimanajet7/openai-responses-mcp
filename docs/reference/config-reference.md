@@ -1,6 +1,6 @@
 
 # 設定リファレンス — `docs/reference/config-reference.md`
-最終更新: 2026-09-07 Asia/Tokyo
+最終更新: 2026-09-09 Asia/Tokyo
 
 本ドキュメントは **openai-responses-mcp** の設定の参照資料です。  
 設定の**優先順位**は **ENV > YAML > TS defaults**（後勝ち、オブジェクトは深いマージ／配列は置換）。
@@ -37,15 +37,15 @@ openai:
 # マルチプロファイル設定
 model_profiles:
   answer:                          # 基準ツール（必須）
-    model: string                  # 例: gpt-5.6-terra
+    model: string                  # 例: gpt-6-astra
     reasoning_effort: string       # none|low|medium|high|xhigh|max
     verbosity: string              # low|medium|high
   answer_detailed:                 # 詳細分析（オプション）
-    model: string                  # 例: gpt-5.6-sol
+    model: string                  # 例: gpt-6-astra
     reasoning_effort: string
     verbosity: string
   answer_quick:                    # 高速回答（オプション）
-    model: string                  # 例: gpt-5.6-luna
+    model: string                  # 例: gpt-6-astra
     reasoning_effort: string
     verbosity: string
 
@@ -83,7 +83,7 @@ openai:
 
 # マルチプロファイル既定値
 model_profiles:
-  answer: { model: gpt-5.6-sol, reasoning_effort: medium, verbosity: medium }
+  answer: { model: gpt-6-astra, reasoning_effort: medium, verbosity: medium }
 
 request: { timeout_ms: 300000, max_retries: 3 }
 
@@ -105,7 +105,7 @@ server: { debug: false, debug_file: null, show_config_on_start: false }
 ```yaml
 model_profiles:
   answer:
-    model: gpt-5.6-sol
+    model: gpt-6-astra
     reasoning_effort: medium
     verbosity: medium
 ```
@@ -119,15 +119,15 @@ openai:
 # マルチプロファイル設定（v0.4.0+）
 model_profiles:
   answer_detailed:
-    model: gpt-5.6-sol
+    model: gpt-6-astra
     reasoning_effort: high
     verbosity: high
   answer:
-    model: gpt-5.6-terra
+    model: gpt-6-astra
     reasoning_effort: medium
     verbosity: medium
   answer_quick:
-    model: gpt-5.6-luna
+    model: gpt-6-astra
     reasoning_effort: low
     verbosity: low
 
@@ -150,16 +150,16 @@ server:
   show_config_on_start: true
 ```
 
-### 5.3 GPT-5.6 モデルの選び方
+### 5.3 モデルと推論強度の選択
 
-- `gpt-5.6-sol`: 最高性能を優先する詳細分析向け。TS defaults と最小設定の既定モデル。
-- `gpt-5.6-terra`: 知能・速度・コストの均衡を重視する標準回答向け。
-- `gpt-5.6-luna`: 高スループット・低コストを重視する高速回答向け。
-- `gpt-5.6` は `gpt-5.6-sol` のエイリアス。設定の再現性を高めるには上記の明示IDを使用する。
-- GPT-5.6 の Pro はモデルIDではなく Responses API の `reasoning.mode: "pro"` で指定する。v1.2.2 はこの設定項目を公開していないため、`gpt-5.6-pro` は指定しない。
+- 既定モデルと同梱例は `gpt-6-astra`。推論強度・詳しさの既定値はいずれも `medium`。
+- 別モデルを使う場合は `model_profiles.*.model` または `MODEL_ANSWER` にモデルIDを指定する。優先順位は ENV > YAML > TS defaults。Responses API と `web_search` に対応するモデルを使用する。
+- Astra の推論強度は `low` / `medium` / `high` / `xhigh` / `max`。`none` は非対応。モデル未指定で `none` を独自設定している場合は、Astra への移行時に対応する値へ変更する。設定値の自動変換は行わない。
+- `text.verbosity` は `gpt-5` / `gpt-6`、`reasoning.effort` は `gpt-5` / `gpt-6` / `o3` / `o4` の接頭辞を持つモデルに送信する。それぞれ対象外のモデルには送信しない。モデルだけを `gpt-4.1` に指定した場合も推論用パラメーターを送信せず、追加の `null` 設定は不要。
+- 系列判定は本製品の機能適用規則。モデルごとの対応値・制約は公式資料で確認する。`reasoning.mode` は設定項目として公開していない。
 - MCP 応答の `model` は Responses API の `response.model` を返す。エイリアス指定時も実際に処理したモデルを確認できる。
 
-公式仕様: [GPT-5.6 migration guidance](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6#migrate-to-gpt-56)、[Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol)、[Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra)、[Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna)
+公式仕様: [GPT-6 Astra migration guidance](https://developers.openai.com/api/docs/guides/latest-model#update-api-and-model-parameters)、[GPT-6 Astra](https://developers.openai.com/api/docs/models/gpt-6-astra)、[GPT-4.1 migration guidance](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-4.1#migration-quickstart)
 
 ---
 
@@ -219,7 +219,7 @@ YAML を読み込んだ場合、`sources.yaml` は `--config` で指定した YA
   },
   "effective": {
     "openai": { "api_key_env": "OPENAI_API_KEY", "base_url": "https://api.openai.com/v1" },
-    "model_profiles": { "answer": { "model": "gpt-5.6-sol", "reasoning_effort": "medium", "verbosity": "medium" } },
+    "model_profiles": { "answer": { "model": "gpt-6-astra", "reasoning_effort": "medium", "verbosity": "medium" } },
     "request": { "timeout_ms": 300000, "max_retries": 3 },
     
     "policy": { "max_citations": 3 },
