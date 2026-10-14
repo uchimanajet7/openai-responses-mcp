@@ -39,11 +39,11 @@
     "test:cancel-during-call": "node scripts/test-cancel-during-call.js"
   },
   "dependencies": {
-    "openai": "^7.27.0",
+    "openai": "^7.32.0",
     "yaml": "^2.9.1"
   },
   "devDependencies": {
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.5",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   },
